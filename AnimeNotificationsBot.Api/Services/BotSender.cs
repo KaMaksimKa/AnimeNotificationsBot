@@ -1,4 +1,5 @@
-﻿using AnimeNotificationsBot.Api.Services.Interfaces;
+﻿using AnimeNotificationsBot.Api.Services.CallbackQueryAnswers;
+using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.Api.Services.Messages;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -28,15 +29,14 @@ namespace AnimeNotificationsBot.Api.Services
                 replyMarkup: message.ReplyMarkup as InlineKeyboardMarkup,cancellationToken: cancellationToken);
         }
 
-        public async Task AnswerCallbackQueryAsync(string callbackQueryId, CancellationToken cancellationToken = default)
+        public async Task AnswerCallbackQueryAsync(string callbackQueryId, CallbackQueryAnswer answer, CancellationToken cancellationToken = default)
         {
-            await _botClient.AnswerCallbackQueryAsync(callbackQueryId,cancellationToken:cancellationToken);
+            await _botClient.AnswerCallbackQueryAsync(callbackQueryId, answer.Text, answer.ShowAlert, cancellationToken: cancellationToken);
         }
 
         public async Task DeleteReplyMarkup(long chatId, int messageId, CancellationToken cancellationToken = default)
         {
-            await _botClient.EditMessageReplyMarkupAsync(chatId,messageId,replyMarkup:null,
-                cancellationToken:cancellationToken);
+            await _botClient.EditMessageReplyMarkupAsync(chatId, messageId, cancellationToken: cancellationToken);
         }
     }
 }

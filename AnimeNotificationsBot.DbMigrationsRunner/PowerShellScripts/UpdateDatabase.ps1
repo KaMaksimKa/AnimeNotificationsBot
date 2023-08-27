@@ -1,0 +1,1 @@
+﻿dotnet ef database update --project ..\..\AnimeNotificationsBot.DAL\AnimeNotificationsBot.DAL.csproj --startup-project ..\AnimeNotificationsBot.DbMigrationsRunner.csproj

@@ -1,4 +1,5 @@
-﻿using AnimeNotificationsBot.Api.Services.Interfaces;
+﻿using System.Security.Claims;
+using AnimeNotificationsBot.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
 
@@ -15,11 +16,10 @@ namespace AnimeNotificationsBot.Api.Controllers
             _botService = botService;
         }
 
-        [Route("api/bot")]
+        [Route("bot")]
         [HttpPost]
         public async Task<IActionResult> Bot([FromBody] Update update, CancellationToken cancellationToken)
         {
-
             await _botService.HandleUpdateAsync(update, cancellationToken);
             return Ok();
         }

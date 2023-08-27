@@ -23,7 +23,7 @@ namespace AnimeNotificationsBot.Api.Services
             using var scope = _serviceProvider.CreateScope();
             var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
 
-            var webhookAddress = $"{_botConfig.HostAddress}/bot";
+            var webhookAddress = $"{_botConfig.HostAddress}/{_botConfig.Route}/{_botConfig.BotToken}";
          
             await botClient.SetWebhookAsync(
                 url: webhookAddress,

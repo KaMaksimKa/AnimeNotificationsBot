@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AnimeNotificationsBot.Common\AnimeNotificationsBot.Common.csproj" />
+    <ProjectReference Include="..\AnimeNotificationsBot.DAL\AnimeNotificationsBot.DAL.csproj" />
+  </ItemGroup>
+
 </Project>

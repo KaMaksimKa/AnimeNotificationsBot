@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="Quartz" Version="3.7.0" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AnimeNotificationsBot.BLL\AnimeNotificationsBot.BLL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ParserAnimeGO">
+      <HintPath>..\..\..\OldRepos\repos\ParserAnimeGO\ParserAnimeGO\bin\Debug\net7.0\ParserAnimeGO.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

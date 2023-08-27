@@ -9,6 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimeNotificationsBot.BLL",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimeNotificationsBot.DAL", "AnimeNotificationsBot.DAL\AnimeNotificationsBot.DAL.csproj", "{DE287FBF-63FD-42A4-90E9-20ABE1C23943}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimeNotificationsBot.Quartz", "AnimeNotificationsBot.Quartz\AnimeNotificationsBot.Quartz.csproj", "{619941A7-21D8-4D2D-9D06-759B40DD9EB5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimeNotificationsBot.DbMigrationsRunner", "AnimeNotificationsBot.DbMigrationsRunner\AnimeNotificationsBot.DbMigrationsRunner.csproj", "{0D1DAE3C-DA40-461E-A3FD-F0A81C5C932D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeNotificationsBot.Common", "AnimeNotificationsBot.Common\AnimeNotificationsBot.Common.csproj", "{F234CE86-3913-4E52-990A-82A8C3DBE528}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +33,18 @@ Global
 		{DE287FBF-63FD-42A4-90E9-20ABE1C23943}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE287FBF-63FD-42A4-90E9-20ABE1C23943}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE287FBF-63FD-42A4-90E9-20ABE1C23943}.Release|Any CPU.Build.0 = Release|Any CPU
+		{619941A7-21D8-4D2D-9D06-759B40DD9EB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{619941A7-21D8-4D2D-9D06-759B40DD9EB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{619941A7-21D8-4D2D-9D06-759B40DD9EB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{619941A7-21D8-4D2D-9D06-759B40DD9EB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D1DAE3C-DA40-461E-A3FD-F0A81C5C932D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D1DAE3C-DA40-461E-A3FD-F0A81C5C932D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D1DAE3C-DA40-461E-A3FD-F0A81C5C932D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D1DAE3C-DA40-461E-A3FD-F0A81C5C932D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F234CE86-3913-4E52-990A-82A8C3DBE528}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F234CE86-3913-4E52-990A-82A8C3DBE528}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F234CE86-3913-4E52-990A-82A8C3DBE528}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F234CE86-3913-4E52-990A-82A8C3DBE528}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
