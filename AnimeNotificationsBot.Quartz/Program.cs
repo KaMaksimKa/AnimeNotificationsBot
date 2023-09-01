@@ -44,8 +44,6 @@ builder.Services.Configure<QuartzConfig>(quartzSection);
 builder.Services.AddQuartz();
 builder.Services.AddQuartzHostedService();
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.ConfigureOptions<AnimeNotificationOptions>();

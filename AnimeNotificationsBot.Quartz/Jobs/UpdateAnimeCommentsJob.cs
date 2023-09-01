@@ -1,4 +1,5 @@
 ﻿using AnimeNotificationsBot.BLL.Interfaces;
+using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -11,13 +12,13 @@ namespace AnimeNotificationsBot.Quartz.Jobs
     public class UpdateAnimeCommentsJob : IJob
     {
         private readonly ParserAnimeGo _parser;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly DataContext _context;
         private readonly IMapper _mapper;
 
-        public UpdateAnimeCommentsJob(ParserAnimeGo parser, IUnitOfWork unitOfWork, IMapper mapper)
+        public UpdateAnimeCommentsJob(ParserAnimeGo parser, DataContext context, IMapper mapper)
         {
             _parser = parser;
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -28,12 +29,12 @@ namespace AnimeNotificationsBot.Quartz.Jobs
             List<Anime> animes;
             do
             {
-                animes = await _unitOfWork.Animes.GetRangeWhereAsync(async x => await x
+                animes = await _context.Animes
                     .Include(y => y.Comments)
                     .OrderBy(y => y.Id)
                     .Skip((numberOfPage - 1) * takeCount)
                     .Take(takeCount)
-                    .ToListAsync());
+                    .ToListAsync();
 
                 foreach (var anime in animes)
                 {
@@ -51,7 +52,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
                     anime.Comments.AddRange(comments);
                 }
 
-                await _unitOfWork.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
                 numberOfPage++;
             } while (animes.Any());

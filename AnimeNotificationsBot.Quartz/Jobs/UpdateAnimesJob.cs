@@ -1,4 +1,5 @@
 ﻿using AnimeNotificationsBot.BLL.Interfaces;
+using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
     public class UpdateAnimesJob : IJob
     {
         private readonly ParserAnimeGo _parser;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly DataContext _context;
         private readonly IMapper _mapper;
         private List<Genre> _genres = new List<Genre>();
         private List<AnimeType> _types = new List<AnimeType>();
@@ -22,20 +23,20 @@ namespace AnimeNotificationsBot.Quartz.Jobs
         private List<MpaaRate> _mpaaRates = new List<MpaaRate>();
 
 
-        public UpdateAnimesJob(ParserAnimeGo parser, IUnitOfWork unitOfWork, IMapper mapper)
+        public UpdateAnimesJob(ParserAnimeGo parser, DataContext context, IMapper mapper)
         {
             _parser = parser;
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
         public async Task Execute(IJobExecutionContext context)
         {
-            _genres = await _unitOfWork.Genres.GetAll();
-            _types = await _unitOfWork.AnimesTypes.GetAll();
-            _statuses = await _unitOfWork.AnimeStatuses.GetAll();
-            _studios = await _unitOfWork.Studios.GetAll();
-            _dubbing = await _unitOfWork.Dubbing.GetAll();
-            _mpaaRates = await _unitOfWork.MpaaRates.GetAll();
+            _genres = await _context.Genres.ToListAsync();
+            _types = await _context.AnimeTypes.ToListAsync();
+            _statuses = await _context.AnimeStatuses.ToListAsync();
+            _studios = await _context.Studios.ToListAsync();
+            _dubbing = await _context.Dubbing.ToListAsync();
+            _mpaaRates = await _context.MpaaRates.ToListAsync();
 
             List<AnimeFromParser> animesFromParser;
             var numberOfPage = 1;
@@ -45,7 +46,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
                 var animes = animesFromParser.Select(x => _mapper.Map<Anime>(x)).ToList();
                 var preparedAnimes = await PrepareAnimesForAddToContext(animes);
                 await AddOrUpdateAnimesInContext(preparedAnimes);
-                await _unitOfWork.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
                 numberOfPage++;
 
@@ -71,7 +72,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
 
                     if (type == null)
                     {
-                        await _unitOfWork.AnimesTypes.AddAsync(anime.Type);
+                        await _context.AnimeTypes.AddAsync(anime.Type);
                         _types.Add(anime.Type);
                     }
                     else
@@ -88,7 +89,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
 
                     if (mpaaRate == null)
                     {
-                        await _unitOfWork.MpaaRates.AddAsync(anime.MpaaRate);
+                        await _context.MpaaRates.AddAsync(anime.MpaaRate);
                         _mpaaRates.Add(anime.MpaaRate);
                     }
                     else
@@ -105,7 +106,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
 
                     if (status == null)
                     {
-                        await _unitOfWork.AnimeStatuses.AddAsync(anime.Status);
+                        await _context.AnimeStatuses.AddAsync(anime.Status);
                         _statuses.Add(anime.Status);
                     }
                     else
@@ -123,7 +124,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
 
                     if (_genre == null)
                     {
-                        await _unitOfWork.Genres.AddAsync(genre);
+                        await _context.Genres.AddAsync(genre);
                         _genres.Add(genre);
                         genres.Add(genre);
                     }
@@ -144,7 +145,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
 
                     if (_dubbingEntity == null)
                     {
-                        await _unitOfWork.Dubbing.AddAsync(dubbingEntity);
+                        await _context.Dubbing.AddAsync(dubbingEntity);
                         _dubbing.Add(dubbingEntity);
                         dubbing.Add(dubbingEntity);
                     }
@@ -165,7 +166,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
 
                     if (_dubbingEntity == null)
                     {
-                        await _unitOfWork.Dubbing.AddAsync(dubbingEntity);
+                        await _context.Dubbing.AddAsync(dubbingEntity);
                         _dubbing.Add(dubbingEntity);
                         dubbingFromFirstEpisode.Add(dubbingEntity);
                     }
@@ -186,7 +187,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
 
                     if (_studio == null)
                     {
-                        await _unitOfWork.Studios.AddAsync(studio);
+                        await _context.Studios.AddAsync(studio);
                         _studios.Add(studio);
                         studios.Add(studio);
                     }
@@ -207,7 +208,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
         {
             #region Подготовка Animes
 
-            var _animes = await _unitOfWork.Animes.GetRangeWhereAsync(async x => await x
+            var _animes = await _context.Animes
                 .Include(y => y.Genres)
                 .Include(y => y.Dubbing)
                 .Include(y => y.DubbingFromFirstEpisode)
@@ -215,7 +216,7 @@ namespace AnimeNotificationsBot.Quartz.Jobs
                 .Where(y => animes
                     .Select(z => z.IdFromAnimeGo)
                     .Contains(y.IdFromAnimeGo))
-                .ToListAsync());
+                .ToListAsync();
 
 
             foreach (var _anime in _animes)
@@ -234,10 +235,10 @@ namespace AnimeNotificationsBot.Quartz.Jobs
                     { } animeFromDb)
                 {
                     _mapper.Map(anime, animeFromDb);
-                    _unitOfWork.Animes.Update(animeFromDb);
+                    _context.Animes.Update(animeFromDb);
                 }
                 else
-                    await _unitOfWork.Animes.AddAsync(anime);
+                    await _context.Animes.AddAsync(anime);
             }
         }
 
