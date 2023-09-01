@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using System.Reflection;
+﻿using System.Reflection;
+using Newtonsoft.Json;
 using Telegram.Bot.Types;
 
-namespace TeamSchedule.Api
+namespace AnimeNotificationsBot.Api
 {
     public class NewtonsoftJsonUpdate : Update
     {

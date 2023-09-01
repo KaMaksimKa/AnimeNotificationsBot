@@ -1,5 +1,5 @@
 ﻿
-using AnimeNotificationsBot.DAL.Interfaces;
+using AnimeNotificationsBot.Common.Interfaces;
 
 namespace AnimeNotificationsBot.DAL.Entities
 {
@@ -10,7 +10,7 @@ namespace AnimeNotificationsBot.DAL.Entities
 
         public bool IsRemoved { get; set; }
 
-        public virtual ICollection<Anime> Animes { get; set; } = new List<Anime>();
+        public virtual List<Anime> Animes { get; set; } = new List<Anime>();
     
     }
 }

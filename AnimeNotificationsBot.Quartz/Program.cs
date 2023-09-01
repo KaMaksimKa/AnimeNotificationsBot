@@ -1,6 +1,9 @@
 
 
+using AnimeNotificationsBot.BLL;
+using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.DAL;
+using AnimeNotificationsBot.Quartz.AutoMapper;
 using AnimeNotificationsBot.Quartz.Configs;
 using AnimeNotificationsBot.Quartz.JobOptions;
 using Microsoft.EntityFrameworkCore;
@@ -18,16 +21,20 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 builder.Services.AddScoped<IAnimeGoUriFactory, AnimeGoUriFactory>();
 
-var requestParserFactorySection = builder.Configuration.GetSection(RequestParserFactoryConfig.Configuration);
-builder.Services.Configure<RequestParserFactoryConfig>(requestParserFactorySection);
-var requestParserFactoryConfig = requestParserFactorySection.Get<RequestParserFactoryConfig>()!;
-builder.Services.AddScoped<IRequestParserFactory, RequestParserFactory>(factory => new RequestParserFactory()
+var requestParserFactorySection = builder.Configuration.GetSection(ParserConfig.Configuration);
+builder.Services.Configure<ParserConfig>(requestParserFactorySection);
+var parserConfig = requestParserFactorySection.Get<ParserConfig>()!;
+builder.Services.AddScoped<IRequestParserFactory, RequestParserFactory>(services => new RequestParserFactory()
 {
-    Cookies = requestParserFactoryConfig.Cookies,
-    UserAgent = requestParserFactoryConfig.UserAgent,
+    Cookies = parserConfig.Cookies,
+    UserAgent = parserConfig.UserAgent,
 });
 
-builder.Services.AddScoped<IRequestParserHandler, RequestParserHandler>();
+builder.Services.AddScoped<IRequestParserHandler, RequestParserHandler>(services => new RequestParserHandler()
+{
+    TimeBetweenRequest = TimeSpan.FromSeconds(parserConfig.TimeBetweenRequestFromSeconds),
+});
+
 builder.Services.AddScoped<IAnimeParserFromIDocument,ParserFromIDocument>();
 builder.Services.AddScoped<ParserAnimeGo>();
 
@@ -37,7 +44,13 @@ builder.Services.Configure<QuartzConfig>(quartzSection);
 builder.Services.AddQuartz();
 builder.Services.AddQuartzHostedService();
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 builder.Services.ConfigureOptions<AnimeNotificationOptions>();
+builder.Services.ConfigureOptions<UpdateAnimesOptions>();
+builder.Services.ConfigureOptions<UpdateAnimeCommentsOptions>();
 
 var app = builder.Build();
 

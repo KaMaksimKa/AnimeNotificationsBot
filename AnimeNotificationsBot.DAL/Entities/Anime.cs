@@ -1,4 +1,4 @@
-﻿using AnimeNotificationsBot.DAL.Interfaces;
+﻿using AnimeNotificationsBot.Common.Interfaces;
 
 namespace AnimeNotificationsBot.DAL.Entities
 {
@@ -26,12 +26,12 @@ namespace AnimeNotificationsBot.DAL.Entities
         public MpaaRate? MpaaRate { get; set; }
         public AnimeType? Type { get; set; }
 
-        public virtual ICollection<Studio> Studios { get; set; } = new List<Studio>();
-        public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
-        public virtual ICollection<Dubbing> Dubbing { get; set; } = new List<Dubbing>();
-        public virtual ICollection<Dubbing> DubbingFromFirstEpisode { get; set; } = new List<Dubbing>();
-        public virtual ICollection<AnimeComment> Comments { get; set; } = new List<AnimeComment>();
-        public virtual ICollection<User> Users { get; set; } = new List<User>();
+        public virtual List<Studio> Studios { get; set; } = new List<Studio>();
+        public virtual List<Genre> Genres { get; set; } = new List<Genre>();
+        public virtual List<Dubbing> Dubbing { get; set; } = new List<Dubbing>();
+        public virtual List<Dubbing> DubbingFromFirstEpisode { get; set; } = new List<Dubbing>();
+        public virtual List<AnimeComment> Comments { get; set; } = new List<AnimeComment>();
+        public virtual List<AnimeSubscription> AnimeSubscriptions { get; set; } = new List<AnimeSubscription>();
 
     }
 }

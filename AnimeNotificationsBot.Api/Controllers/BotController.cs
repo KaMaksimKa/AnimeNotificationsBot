@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using AnimeNotificationsBot.Api.Services.Interfaces;
+﻿using AnimeNotificationsBot.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
 

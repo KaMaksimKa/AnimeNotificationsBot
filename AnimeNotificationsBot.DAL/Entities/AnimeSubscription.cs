@@ -1,4 +1,4 @@
-﻿using AnimeNotificationsBot.DAL.Interfaces;
+﻿using AnimeNotificationsBot.Common.Interfaces;
 
 namespace AnimeNotificationsBot.DAL.Entities
 {

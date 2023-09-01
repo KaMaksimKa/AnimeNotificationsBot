@@ -1,6 +1,6 @@
-﻿using AnimeNotificationsBot.BLL.Interfaces;
+﻿using AnimeNotificationsBot.BLL.Interfaces.Repositories;
+using AnimeNotificationsBot.Common.Interfaces;
 using AnimeNotificationsBot.DAL;
-using AnimeNotificationsBot.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnimeNotificationsBot.BLL.Repositories.Base
@@ -11,12 +11,12 @@ namespace AnimeNotificationsBot.BLL.Repositories.Base
         {
         }
 
-        public async Task<IEnumerable<T>> GetRangeWhereAsync(Func<IQueryable<T>, Task<IEnumerable<T>>> selector, bool includingDeleted = false)
+        public async Task<List<T>> GetRangeWhereAsync(Func<IQueryable<T>, Task<List<T>>> selector, bool includingDeleted = false)
         {
             return await selector(Entity.Where(x => !includingDeleted || !x.IsRemoved));
         }
 
-        public async Task<T> GetWhereAsync(Func<IQueryable<T>, Task<T>> selector, bool includingDeleted = false)
+        public async Task<T?> GetFirstOrDefaultAsync(Func<IQueryable<T>, Task<T?>> selector, bool includingDeleted = false)
         {
             return await selector(Entity.Where(x => !includingDeleted || !x.IsRemoved));
         }

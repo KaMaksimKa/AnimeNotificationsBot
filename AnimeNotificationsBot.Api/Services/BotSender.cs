@@ -1,8 +1,9 @@
 ﻿using AnimeNotificationsBot.Api.Services.CallbackQueryAnswers;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages;
+using AnimeNotificationsBot.Api.Services.Messages.Base;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace AnimeNotificationsBot.Api.Services
@@ -16,10 +17,16 @@ namespace AnimeNotificationsBot.Api.Services
             _botClient = botClient;
         }
 
-        public async Task<Message> SendTextMessageAsync(TextMessage message, long chatId, CancellationToken cancellationToken = default)
+        public async Task<Message> SendMessageAsync(TextMessage message, long chatId, CancellationToken cancellationToken = default)
         {
-            return await _botClient.SendTextMessageAsync(chatId,message.Text,replyMarkup:message.ReplyMarkup,
+            return await _botClient.SendTextMessageAsync(chatId,message.Text,replyMarkup:message.ReplyMarkup, parseMode:message.ParseMode,
                 cancellationToken:cancellationToken);
+        }
+
+        public async Task<Message> SendMessageAsync(PhotoMessage message, long chatId, CancellationToken cancellationToken = default)
+        {
+            return await _botClient.SendPhotoAsync(chatId,new InputOnlineFile(message.Content,message.FileName), message.Text, replyMarkup: message.ReplyMarkup,
+                cancellationToken: cancellationToken);
         }
 
         public async Task<Message> EditTextMessageAsync(TextMessage message, long chatId, int messageId,
@@ -37,6 +44,11 @@ namespace AnimeNotificationsBot.Api.Services
         public async Task DeleteReplyMarkup(long chatId, int messageId, CancellationToken cancellationToken = default)
         {
             await _botClient.EditMessageReplyMarkupAsync(chatId, messageId, cancellationToken: cancellationToken);
+        }
+
+        public async Task DeleteMessageAsync(long chatId, int messageId, CancellationToken cancellationToken = default)
+        {
+            await _botClient.DeleteMessageAsync(chatId, messageId, cancellationToken);
         }
     }
 }

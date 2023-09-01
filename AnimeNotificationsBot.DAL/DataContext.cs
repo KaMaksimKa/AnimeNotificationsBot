@@ -27,8 +27,6 @@ namespace AnimeNotificationsBot.DAL
                 .WithOne(x => x.ParentComment)
                 .HasForeignKey(x => x.ParentCommentId);
 
-            modelBuilder.Entity<AnimeComment>().HasIndex(x => x.CommentId).IsUnique();
-
             modelBuilder.Entity<Dubbing>().HasIndex(x => x.Title).IsUnique();
 
             modelBuilder.Entity<Genre>().HasIndex(x => x.Title).IsUnique();
@@ -53,6 +51,8 @@ namespace AnimeNotificationsBot.DAL
 
             modelBuilder.Entity<User>().HasIndex(x => x.TelegramUserId).IsUnique();
             modelBuilder.Entity<User>().HasIndex(x => x.TelegramChatId).IsUnique();
+
+            modelBuilder.Entity<AnimeNotification>().HasIndex(x => new{x.AnimeId,x.DubbingId,x.SerialNumber}).IsUnique();
         }
 
         public static void Configure(DbContextOptionsBuilder optionsBuilder, string dbSettings)

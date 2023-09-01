@@ -1,4 +1,4 @@
-﻿namespace AnimeNotificationsBot.DAL.Interfaces
+﻿namespace AnimeNotificationsBot.Common.Interfaces
 {
     public interface IEntity
     {

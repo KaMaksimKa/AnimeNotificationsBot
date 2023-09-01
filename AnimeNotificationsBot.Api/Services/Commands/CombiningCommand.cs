@@ -22,7 +22,9 @@ namespace AnimeNotificationsBot.Api.Services.Commands
                 throw new ArgumentException();
             }
 
-            foreach (var command in _commands)
+            var commands = _commands.Where(x => x.CanExecute());
+
+            foreach (var command in commands)
             {
                 await command.ExecuteAsync();
             }

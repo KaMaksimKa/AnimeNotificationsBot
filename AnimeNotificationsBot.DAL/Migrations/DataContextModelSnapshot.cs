@@ -66,8 +66,8 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("animes_id");
 
-                    b.Property<int>("GenresId")
-                        .HasColumnType("integer")
+                    b.Property<long>("GenresId")
+                        .HasColumnType("bigint")
                         .HasColumnName("genres_id");
 
                     b.HasKey("AnimesId", "GenresId")
@@ -190,11 +190,8 @@ namespace AnimeNotificationsBot.DAL.Migrations
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.AnimeComment", b =>
                 {
                     b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<long>("AnimeId")
                         .HasColumnType("bigint")
@@ -208,11 +205,7 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnType("text")
                         .HasColumnName("comment");
 
-                    b.Property<long>("CommentId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("comment_id");
-
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTimeOffset?>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date");
 
@@ -229,10 +222,6 @@ namespace AnimeNotificationsBot.DAL.Migrations
 
                     b.HasIndex("AnimeId")
                         .HasDatabaseName("ix_anime_comments_anime_id");
-
-                    b.HasIndex("CommentId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_anime_comments_comment_id");
 
                     b.HasIndex("ParentCommentId")
                         .HasDatabaseName("ix_anime_comments_parent_comment_id");
@@ -257,36 +246,27 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date");
 
-                    b.Property<long?>("DubbingId")
+                    b.Property<long>("DubbingId")
                         .HasColumnType("bigint")
                         .HasColumnName("dubbing_id");
-
-                    b.Property<string>("Href")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("href");
 
                     b.Property<bool>("IsNotified")
                         .HasColumnType("boolean")
                         .HasColumnName("is_notified");
 
-                    b.Property<int>("SerialNumber")
+                    b.Property<int?>("SerialNumber")
                         .HasColumnType("integer")
                         .HasColumnName("serial_number");
-
-                    b.Property<string>("TitleAnime")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("title_anime");
 
                     b.HasKey("Id")
                         .HasName("pk_anime_notifications");
 
-                    b.HasIndex("AnimeId")
-                        .HasDatabaseName("ix_anime_notifications_anime_id");
-
                     b.HasIndex("DubbingId")
                         .HasDatabaseName("ix_anime_notifications_dubbing_id");
+
+                    b.HasIndex("AnimeId", "DubbingId", "SerialNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_anime_notifications_anime_id_dubbing_id_serial_number");
 
                     b.ToTable("anime_notifications", (string)null);
                 });
@@ -299,6 +279,10 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("IsRemoved")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_removed");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -315,6 +299,50 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.ToTable("anime_statuses", (string)null);
                 });
 
+            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.AnimeSubscription", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AnimeId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("anime_id");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<long>("DubbingId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("dubbing_id");
+
+                    b.Property<bool>("IsRemoved")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_removed");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_anime_subscription");
+
+                    b.HasIndex("AnimeId")
+                        .HasDatabaseName("ix_anime_subscription_anime_id");
+
+                    b.HasIndex("DubbingId")
+                        .HasDatabaseName("ix_anime_subscription_dubbing_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_anime_subscription_user_id");
+
+                    b.ToTable("anime_subscription", (string)null);
+                });
+
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.AnimeType", b =>
                 {
                     b.Property<long>("Id")
@@ -323,6 +351,10 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("IsRemoved")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_removed");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -348,6 +380,10 @@ namespace AnimeNotificationsBot.DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<bool>("IsRemoved")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_removed");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text")
@@ -365,12 +401,16 @@ namespace AnimeNotificationsBot.DAL.Migrations
 
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Genre", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("IsRemoved")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_removed");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -396,6 +436,10 @@ namespace AnimeNotificationsBot.DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<bool>("IsRemoved")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_removed");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text")
@@ -419,6 +463,10 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("IsRemoved")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_removed");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -449,9 +497,9 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnType("text")
                         .HasColumnName("first_name");
 
-                    b.Property<bool>("IsRemove")
+                    b.Property<bool>("IsRemoved")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_remove");
+                        .HasColumnName("is_removed");
 
                     b.Property<string>("LastName")
                         .HasColumnType("text")
@@ -500,25 +548,6 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasDatabaseName("ix_anime_studio_studios_id");
 
                     b.ToTable("anime_studio", (string)null);
-                });
-
-            modelBuilder.Entity("AnimeUser", b =>
-                {
-                    b.Property<long>("AnimesId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("animes_id");
-
-                    b.Property<long>("UsersId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("users_id");
-
-                    b.HasKey("AnimesId", "UsersId")
-                        .HasName("pk_anime_user");
-
-                    b.HasIndex("UsersId")
-                        .HasDatabaseName("ix_anime_user_users_id");
-
-                    b.ToTable("anime_user", (string)null);
                 });
 
             modelBuilder.Entity("AnimeDubbing", b =>
@@ -627,11 +656,43 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.HasOne("AnimeNotificationsBot.DAL.Entities.Dubbing", "Dubbing")
                         .WithMany("AnimeNotifications")
                         .HasForeignKey("DubbingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_anime_notifications_dubbing_dubbing_id");
 
                     b.Navigation("Anime");
 
                     b.Navigation("Dubbing");
+                });
+
+            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.AnimeSubscription", b =>
+                {
+                    b.HasOne("AnimeNotificationsBot.DAL.Entities.Anime", "Anime")
+                        .WithMany("AnimeSubscriptions")
+                        .HasForeignKey("AnimeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_anime_subscription_animes_anime_id");
+
+                    b.HasOne("AnimeNotificationsBot.DAL.Entities.Dubbing", "Dubbing")
+                        .WithMany("AnimeSubscriptions")
+                        .HasForeignKey("DubbingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_anime_subscription_dubbing_dubbing_id");
+
+                    b.HasOne("AnimeNotificationsBot.DAL.Entities.User", "User")
+                        .WithMany("AnimeSubscriptions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_anime_subscription_users_user_id");
+
+                    b.Navigation("Anime");
+
+                    b.Navigation("Dubbing");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AnimeStudio", b =>
@@ -651,25 +712,10 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasConstraintName("fk_anime_studio_studios_studios_id");
                 });
 
-            modelBuilder.Entity("AnimeUser", b =>
-                {
-                    b.HasOne("AnimeNotificationsBot.DAL.Entities.Anime", null)
-                        .WithMany()
-                        .HasForeignKey("AnimesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_anime_user_animes_animes_id");
-
-                    b.HasOne("AnimeNotificationsBot.DAL.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_anime_user_users_users_id");
-                });
-
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Anime", b =>
                 {
+                    b.Navigation("AnimeSubscriptions");
+
                     b.Navigation("Comments");
                 });
 
@@ -691,11 +737,18 @@ namespace AnimeNotificationsBot.DAL.Migrations
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Dubbing", b =>
                 {
                     b.Navigation("AnimeNotifications");
+
+                    b.Navigation("AnimeSubscriptions");
                 });
 
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.MpaaRate", b =>
                 {
                     b.Navigation("Animes");
+                });
+
+            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.User", b =>
+                {
+                    b.Navigation("AnimeSubscriptions");
                 });
 #pragma warning restore 612, 618
         }

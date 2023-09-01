@@ -1,7 +1,7 @@
-﻿using AnimeNotificationsBot.BLL.Interfaces;
+﻿using AnimeNotificationsBot.BLL.Interfaces.Repositories;
 using AnimeNotificationsBot.Common.Exceptions;
+using AnimeNotificationsBot.Common.Interfaces;
 using AnimeNotificationsBot.DAL;
-using AnimeNotificationsBot.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnimeNotificationsBot.BLL.Repositories.Base
@@ -16,12 +16,12 @@ namespace AnimeNotificationsBot.BLL.Repositories.Base
             Context = context;
         }
 
-        public async Task<IEnumerable<T>> GetRangeWhereAsync(Func<IQueryable<T>, Task<IEnumerable<T>>> selector)
+        public async Task<List<T>> GetRangeWhereAsync(Func<IQueryable<T>, Task<List<T>>> selector)
         {
             return await selector(Entity);
         }
 
-        public async Task<T> GetWhereAsync(Func<IQueryable<T>, Task<T>> selector)
+        public async Task<T?> GetFirstOrDefaultAsync(Func<IQueryable<T>, Task<T?>> selector)
         {
             return await selector(Entity);
         }
@@ -54,6 +54,21 @@ namespace AnimeNotificationsBot.BLL.Repositories.Base
         public void Update(T entity)
         {
             Entity.Update(entity);
+        }
+
+        public void UpdateRange(IEnumerable<T> entities)
+        {
+            Entity.UpdateRange(entities);
+        }
+
+        public void Remove(T entity)
+        {
+            Entity.Remove(entity);
+        }
+
+        public void RemoveRange(IEnumerable<T> entities)
+        {
+            Entity.RemoveRange(entities);
         }
 
         public async Task RemoveById(int id)

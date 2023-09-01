@@ -1,13 +1,11 @@
-﻿using AnimeNotificationsBot.DAL.Interfaces;
+﻿using AnimeNotificationsBot.Common.Interfaces;
 
 namespace AnimeNotificationsBot.DAL.Entities
 {
     public class AnimeNotification : IEntity
     {
         public long Id { get; set; }
-        public required string TitleAnime { get; set; }
-        public required int SerialNumber { get; set; }
-        public required string Href { get; set; }
+        public int? SerialNumber { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public bool IsNotified { get; set; }
 

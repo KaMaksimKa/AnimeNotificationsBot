@@ -1,10 +1,10 @@
+using AnimeNotificationsBot.Api;
 using AnimeNotificationsBot.Api.Configs;
 using AnimeNotificationsBot.Api.Services;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.DAL;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using TeamSchedule.Api;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
