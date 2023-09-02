@@ -15,6 +15,7 @@ namespace AnimeNotificationsBot.DAL
         public DbSet<AnimeType> AnimeTypes { get; set; } = null!;
         public DbSet<AnimeStatus> AnimeStatuses { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Image> Images { get; set; } = null!;
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

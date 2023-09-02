@@ -25,7 +25,7 @@ namespace AnimeNotificationsBot.Quartz.AutoMapper
                 .ForMember(d => d.Dropped, m => m.MapFrom(s => s.Dropped))
                 .ForMember(d => d.OnHold, m => m.MapFrom(s => s.OnHold))
                 .ForMember(d => d.Href, m => m.MapFrom(s => s.Href))
-                .ForMember(d => d.ImgHref, m => m.MapFrom(s => s.ImgHref))
+                .ForMember(d => d.ImgIdFromAnimeGo, m => m.MapFrom(s => s.ImgIdFromAnimeGo))
                 .ForMember(d => d.NextEpisode, m => m.MapFrom(s => s.NextEpisode))
                 .ForMember(d => d.Duration, m => m.MapFrom(s => s.Duration))
                 .ForMember(d => d.IdForComments, m => m.MapFrom(s => s.IdForComments))

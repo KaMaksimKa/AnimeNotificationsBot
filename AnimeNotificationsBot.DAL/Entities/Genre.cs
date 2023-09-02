@@ -3,7 +3,7 @@ using AnimeNotificationsBot.Common.Interfaces;
 
 namespace AnimeNotificationsBot.DAL.Entities
 {
-    public class Genre: IRemoveEntity
+    public class Genre: IRemoveEntity, ITitleEntity
     {
         public long Id { get; set; }
         public required string Title { get; set; }

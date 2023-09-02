@@ -1,8 +1,9 @@
-﻿namespace AnimeNotificationsBot.Api.Services.Messages.Base
+﻿using AnimeNotificationsBot.Common.Models;
+
+namespace AnimeNotificationsBot.Api.Services.Messages.Base
 {
     public class PhotoMessage: TextMessage
     {
-        public string? FileName { get; set; }
-        public required Stream Content { get; set; } 
+        public FileModel? Photo { get; set; } 
     }
 }

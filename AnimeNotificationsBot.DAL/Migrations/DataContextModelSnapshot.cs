@@ -120,9 +120,9 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_from_anime_go");
 
-                    b.Property<string>("ImgHref")
+                    b.Property<string>("ImgIdFromAnimeGo")
                         .HasColumnType("text")
-                        .HasColumnName("img_href");
+                        .HasColumnName("img_id_from_anime_go");
 
                     b.Property<long?>("MpaaRateId")
                         .HasColumnType("bigint")
@@ -427,6 +427,38 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.ToTable("genres", (string)null);
                 });
 
+            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Image", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AnimeId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("anime_id");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("file_name");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("path");
+
+                    b.HasKey("Id")
+                        .HasName("pk_images");
+
+                    b.HasIndex("AnimeId")
+                        .HasDatabaseName("ix_images_anime_id");
+
+                    b.ToTable("images", (string)null);
+                });
+
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.MpaaRate", b =>
                 {
                     b.Property<long>("Id")
@@ -695,6 +727,18 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Image", b =>
+                {
+                    b.HasOne("AnimeNotificationsBot.DAL.Entities.Anime", "Anime")
+                        .WithMany("Images")
+                        .HasForeignKey("AnimeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_images_animes_anime_id");
+
+                    b.Navigation("Anime");
+                });
+
             modelBuilder.Entity("AnimeStudio", b =>
                 {
                     b.HasOne("AnimeNotificationsBot.DAL.Entities.Anime", null)
@@ -717,6 +761,8 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.Navigation("AnimeSubscriptions");
 
                     b.Navigation("Comments");
+
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.AnimeComment", b =>

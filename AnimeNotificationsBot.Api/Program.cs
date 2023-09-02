@@ -2,6 +2,8 @@ using AnimeNotificationsBot.Api;
 using AnimeNotificationsBot.Api.Configs;
 using AnimeNotificationsBot.Api.Services;
 using AnimeNotificationsBot.Api.Services.Interfaces;
+using AnimeNotificationsBot.BLL.Interfaces;
+using AnimeNotificationsBot.BLL.Services;
 using AnimeNotificationsBot.DAL;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -27,10 +29,14 @@ builder.Services.AddHttpClient("telegram_bot_client")
 
 builder.Services.AddHostedService<ConfigureWebhook>();
 
-builder.Services.AddScoped<IBotService, BotService>();
 builder.Services.AddScoped<IBotSender, BotSender>();
+builder.Services.AddScoped<ICommandFactory, CommandFactory>();
+builder.Services.AddScoped<IBotService, BotService>();
+builder.Services.AddScoped<IAnimeService, AnimeService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
-builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -62,5 +68,6 @@ app.MapPost($"{botConfiguration.Route}/{botConfiguration.BotToken}", async (Newt
     return Results.Ok();
 });
 
+app.MapGet("/ping", () => Results.Ok());
 
 app.Run();

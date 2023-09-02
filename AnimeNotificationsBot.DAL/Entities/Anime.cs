@@ -18,7 +18,7 @@ namespace AnimeNotificationsBot.DAL.Entities
         public int? Dropped { get; set; }
         public int? OnHold { get; set; }
         public string? Href { get; set; }
-        public string? ImgHref { get; set; }
+        public string? ImgIdFromAnimeGo { get; set; }
         public string? NextEpisode { get; set; }
         public string? Duration { get; set; }
         public long? IdForComments { get; set; }
@@ -32,6 +32,7 @@ namespace AnimeNotificationsBot.DAL.Entities
         public virtual List<Dubbing> DubbingFromFirstEpisode { get; set; } = new List<Dubbing>();
         public virtual List<AnimeComment> Comments { get; set; } = new List<AnimeComment>();
         public virtual List<AnimeSubscription> AnimeSubscriptions { get; set; } = new List<AnimeSubscription>();
+        public virtual List<Image> Images { get; set; } = new List<Image>();
 
     }
 }

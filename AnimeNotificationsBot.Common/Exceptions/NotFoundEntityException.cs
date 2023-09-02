@@ -2,9 +2,10 @@
 {
     public class NotFoundEntityException : ApplicationException
     {
-        public string EntityName { get; set; } = null!;
-        public long EntityId { get; set; }
+        public required string EntityName { get; set; } 
+        public string? PropertyName { get; set; }
+        public object? PropertyValue { get; set; }
 
-        public override string Message => $"{EntityName} with id: {EntityId} not found in database";
+        public override string Message => $"{EntityName} with {PropertyName}: {PropertyValue} not found in database";
     }
 }

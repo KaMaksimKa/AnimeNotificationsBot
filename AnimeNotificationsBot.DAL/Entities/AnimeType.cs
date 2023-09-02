@@ -2,7 +2,7 @@
 
 namespace AnimeNotificationsBot.DAL.Entities
 {
-    public class AnimeType: IRemoveEntity
+    public class AnimeType: IRemoveEntity, ITitleEntity
     {
         public long Id { get; set; }
         public required string Title { get; set; } 
