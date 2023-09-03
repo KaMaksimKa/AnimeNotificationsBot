@@ -17,6 +17,8 @@ namespace AnimeNotificationsBot.DAL
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Image> Images { get; set; } = null!;
         public DbSet<BotMessage> BotMessages { get; set; } = null!;
+        public DbSet<BotMessageGroup> BotMessageGroups { get; set; } = null!;
+        public DbSet<CallbackQueryData> CallbackQueryData { get; set; } = null!;
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

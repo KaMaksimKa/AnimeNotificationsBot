@@ -4,5 +4,6 @@
     {
         public long Id { get; set; }
         public required string TitleRu { get; set; }
+        public required double? Rate { get; set; }
     }
 }

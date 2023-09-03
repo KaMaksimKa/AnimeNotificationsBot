@@ -1,16 +1,18 @@
 ﻿using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
+using AnimeNotificationsBot.BLL.Interfaces;
+
 
 namespace AnimeNotificationsBot.Api.Services.Commands.Base
 {
     public abstract class CallbackCommand:TelegramCommand
     {
         protected CallbackCommandArgs CommandArgs;
+        protected readonly ICallbackQueryDataService CallbackQueryDataService;
 
-        protected Dictionary<string, string> Args;
-        protected CallbackCommand(CallbackCommandArgs commandArgs):base(commandArgs)
+        protected CallbackCommand(CallbackCommandArgs commandArgs, ICallbackQueryDataService callbackQueryDataService):base(commandArgs)
         {
             CommandArgs = commandArgs;
-            Args = GetArgs();
+            CallbackQueryDataService = callbackQueryDataService;
         }
 
         public sealed override bool CanExecute()
@@ -30,7 +32,19 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
 
         public abstract Task ExecuteCommandAsync();
 
-        protected static string Create(string name,Dictionary<string, string> args)
+        protected async Task<T> GetDataAsync<T>()
+        {
+            var dataId = long.Parse(CommandArgs.CallbackQuery.Data!.Split("?")[1]);
+            return await CallbackQueryDataService.GetAsync<T>(dataId);
+        }
+
+        protected static async Task<string> Create<T>(string name, T data,ICallbackQueryDataService callbackQueryDataService)
+        {
+            var dataId = await callbackQueryDataService.AddAsync(data);
+            return $"{name}?{dataId}";
+        }
+
+        /*protected static string Create(string name,Dictionary<string, string> args)
         {
             var textCommand = name;
             if (args.Any())
@@ -46,9 +60,9 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
             }
 
             return textCommand;
-        }
+        }*/
 
-        private Dictionary<string,string> GetArgs()
+        /*private Dictionary<string,string> GetArgs()
         {
             var argsDictionary = new Dictionary<string,string>();
             var argsString = CommandArgs.CallbackQuery.Data?.Split("?").LastOrDefault();
@@ -65,6 +79,6 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
             }
 
             return argsDictionary;
-        }
+        }*/
     }
 }

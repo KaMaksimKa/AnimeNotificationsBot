@@ -1,24 +1,29 @@
-﻿using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime;
+﻿using AnimeNotificationsBot.Api.Models;
+using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
+using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Anime;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace AnimeNotificationsBot.Api.Services.Messages.Anime
 {
-    public class FoundAnimeMessage: TextMessage
+    public class FoundAnimeMessage: CombiningMessage
     {
-        public FoundAnimeMessage(IEnumerable<AnimeModel> animes, bool isAll)
+        public FoundAnimeMessage(List<AnimeWithImageModel> animes, bool isAll,ICallbackQueryDataService callbackQueryDataService)
         {
+            var mediaGroupMessage = new AnimeImagesMessage(animes);
+
+            var textMessage = new TextMessage();
             if (isAll)
             {
-                Text = $"""
+                textMessage.Text = $"""
                     Сортировка по точности совпадения.
                     Найдено по вашему запросу:
                     """ ;
             }
             else
             {
-                Text = $"""
+                textMessage.Text = $"""
                     Сортировка по точности совпадения.
                     Не все результаты влезли в этот список, попробуй уточнить запрос если не нашел нужного тайтла!
                     Найдено по вашему запросу:
@@ -31,11 +36,15 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Anime
             {
                 buttons.Add(new List<InlineKeyboardButton>()
                 {
-                    InlineKeyboardButton.WithCallbackData(anime.TitleRu,AnimeInfoCommand.Create(anime.Id))
+                    InlineKeyboardButton.WithCallbackData(anime.TitleRu,AnimeInfoCommand.Create(anime.Id, callbackQueryDataService).Result)
                 });
             }
 
-            ReplyMarkup = new InlineKeyboardMarkup(buttons);
+            textMessage.ReplyMarkup = new InlineKeyboardMarkup(buttons);
+
+
+            Messages.Add(mediaGroupMessage);
+            Messages.Add(textMessage);
         }
     }
 }

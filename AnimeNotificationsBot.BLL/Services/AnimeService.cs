@@ -1,4 +1,5 @@
-﻿using AnimeNotificationsBot.BLL.Interfaces;
+﻿using AnimeNotificationsBot.BLL.Enums;
+using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Anime;
 using AnimeNotificationsBot.Common.Exceptions;
 using AnimeNotificationsBot.DAL;
@@ -36,6 +37,7 @@ namespace AnimeNotificationsBot.BLL.Services
                 {
                     Id = anime.Id,
                     TitleRu = anime.TitleRu!,
+                    Rate = anime.Rate,
                     Image = image == null ? null : await _imageService.GetImage(image.Path),
                 });
             }
@@ -61,8 +63,82 @@ namespace AnimeNotificationsBot.BLL.Services
             {
                 Id = anime.Id,
                 TitleRu = anime.TitleRu!,
+                Rate = anime.Rate,
                 Image = image == null ? null : await _imageService.GetImage(image.Path),
             };
+        }
+
+        public async Task<AnimeListModel> GetAnimeWithImageByArgsAsync(AnimeArgs args)
+        {
+            var animeListModel = new AnimeListModel()
+            {
+                Args = args
+            };
+
+
+            var query = _context.Animes
+                .Include(x => x.Images)
+                .Where(x => x.TitleRu != null);
+                /*.Select(x => new
+                {
+                    x.Id,
+                    x.TitleRu,
+                    x.TitleEn,
+                    x.Rate,
+                    x.Images
+                });*/
+
+            if (!string.IsNullOrEmpty(args.SearchQuery))
+            {
+                query = query.Where(x => x.TitleRu!.ToLower().Contains(args.SearchQuery.ToLower())
+                                         || (x.TitleEn != null &&
+                                             x.TitleEn.ToLower().Contains(args.SearchQuery.ToLower())));
+            }
+
+            animeListModel.CountAllAnime = await query.CountAsync();
+
+            query = args.SortType switch
+            {
+                AnimeSortTypeEnum.Rate => args.SortOrder switch
+                {
+                    AnimeSortOrderEnum.Asc => query.OrderBy(x => x.Rate.HasValue ? -1 : x.Rate),
+                    AnimeSortOrderEnum.Desc => query.OrderBy(x => x.Rate),
+                    _ => throw new ArgumentException(nameof(AnimeSortOrderEnum))
+                },
+                AnimeSortTypeEnum.Name => args.SortOrder switch
+                {
+                    AnimeSortOrderEnum.Asc => query.OrderBy(x => x.TitleRu),
+                    AnimeSortOrderEnum.Desc => query.OrderBy(x => x.TitleRu),
+                    _ => throw new ArgumentException(nameof(AnimeSortOrderEnum))
+                },
+                _ => throw new ArgumentException(nameof(AnimeSortTypeEnum))
+
+            };
+
+
+
+            var animes = query
+                .Skip((args.NumberOfPage - 1) * args.CountPerPage)
+                .Take(args.CountPerPage)
+                .ToList();
+
+            var animeModels = new List<AnimeWithImageModel>();
+
+            foreach (var anime in animes)
+            {
+                var image = anime.Images.FirstOrDefault();
+                animeModels.Add(new AnimeWithImageModel
+                {
+                    Id = anime.Id,
+                    TitleRu = anime.TitleRu!,
+                    Rate = anime.Rate,
+                    Image = image == null ? null : await _imageService.GetImage(image.Path),
+                });
+            }
+
+            animeListModel.Animes = animeModels;
+
+            return animeListModel;
         }
     }
 }

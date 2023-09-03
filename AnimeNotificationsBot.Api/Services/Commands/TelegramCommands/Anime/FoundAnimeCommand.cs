@@ -6,6 +6,7 @@ using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.Api.Services.Messages.Anime;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
+using AnimeNotificationsBot.BLL.Models.Anime;
 using AnimeNotificationsBot.Common.Enums;
 
 namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
@@ -17,13 +18,15 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
         private readonly IAnimeService _animeService;
         private readonly IUserService _userService;
         private readonly IBotSender _botSender;
+        private readonly ICallbackQueryDataService _callbackQueryDataService;
 
         public FoundAnimeCommand(MessageCommandArgs commandArgs, IAnimeService animeService, IUserService userService,
-            IBotSender botSender) : base(commandArgs)
+            IBotSender botSender,ICallbackQueryDataService callbackQueryDataService) : base(commandArgs)
         {
             _animeService = animeService;
             _userService = userService;
             _botSender = botSender;
+            _callbackQueryDataService = callbackQueryDataService;
         }
 
         public override CommandTypeEnum Type => CommandTypeEnum.TextAnswer;
@@ -35,35 +38,14 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
 
         public override async Task ExecuteCommandAsync()
         {
-            var animes = await _animeService.GetAnimesWithImagesAsync(CommandArgs.Message.Text);
-
-            if (animes.Any())
+            var animeListModel = await _animeService.GetAnimeWithImageByArgsAsync(new AnimeArgs()
             {
-                var isAll = animes.Count <= MaxFoundAnimeCount;
-                if (!isAll)
-                    animes = animes.Take(MaxFoundAnimeCount).ToList();
+                SearchQuery = CommandArgs.Message.Text
+            });
 
-                await _userService.SetCommandStateAsync(TelegramUserId, CommandStateEnum.None);
+            await _userService.SetCommandStateAsync(TelegramUserId, CommandStateEnum.None);
 
-                var mediaGroupMessage = new MediaGroupMessage()
-                {
-                    Images = animes
-                        .Where(x => x.Image != null)
-                        .Select(x => new TelegramPhotoModel()
-                        {
-                            Caption = x.TitleRu,
-                            Image = x.Image!
-                        }).ToList()
-                };
-
-                await _botSender.SendMessageAsync(mediaGroupMessage, ChatId, CommandArgs.CancellationToken,CommandGroupEnum.AnimeWidget);
-
-                await _botSender.SendMessageAsync(new FoundAnimeMessage(animes, isAll), ChatId, CommandArgs.CancellationToken);
-            }
-            else
-            {
-                await _botSender.SendMessageAsync(new NotFoundAnimeMessage(), ChatId, CommandArgs.CancellationToken);
-            }
+            await _botSender.SendMessageAsync(new AnimeListMessage(animeListModel,_callbackQueryDataService), ChatId, CommandArgs.CancellationToken);
         }
     }
 }

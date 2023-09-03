@@ -3,6 +3,7 @@ using System;
 using AnimeNotificationsBot.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AnimeNotificationsBot.DAL.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230903160546_Refactor")]
+    partial class Refactor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -424,26 +427,6 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasDatabaseName("ix_bot_message_groups_user_id");
 
                     b.ToTable("bot_message_groups", (string)null);
-                });
-
-            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.CallbackQueryData", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Data")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("data");
-
-                    b.HasKey("Id")
-                        .HasName("pk_callback_query_data");
-
-                    b.ToTable("callback_query_data", (string)null);
                 });
 
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Dubbing", b =>

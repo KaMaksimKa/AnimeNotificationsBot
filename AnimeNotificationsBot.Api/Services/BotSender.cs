@@ -2,8 +2,7 @@
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.Models.BotMessage;
-using AnimeNotificationsBot.Common.Enums;
+using AnimeNotificationsBot.BLL.Models.BotMessageGroup;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
@@ -14,36 +13,93 @@ namespace AnimeNotificationsBot.Api.Services
     public class BotSender : IBotSender
     {
         private readonly ITelegramBotClient _botClient;
-        private readonly IBotMessageService _botMessageService;
+        private readonly IBotMessageGroupService _botMessageGroupService;
 
-        public BotSender(ITelegramBotClient botClient,IBotMessageService BotMessageService)
+        public BotSender(ITelegramBotClient botClient, IBotMessageGroupService botMessageGroupService)
         {
             _botClient = botClient;
-            _botMessageService = BotMessageService;
+            _botMessageGroupService = botMessageGroupService;
         }
 
-        public async Task<Message> SendMessageAsync(TextMessage message, long chatId, CancellationToken cancellationToken = default,
-            CommandGroupEnum commandGroup = CommandGroupEnum.None)
+        public async Task ReplaceMessageAsync(ITelegramMessage newMessage, int oldMessageId, long chatId,
+            CancellationToken cancellationToken = default)
         {
-            await DeleteBotMessageByCommandGroupAsync(chatId, commandGroup, cancellationToken);
+            var botMessageGroupModel = await _botMessageGroupService.GetByMessageIdAsync(oldMessageId);
 
-            var resultMessage = await _botClient.SendTextMessageAsync(chatId, message.Text, replyMarkup: message.ReplyMarkup, parseMode: message.ParseMode,
-                cancellationToken: cancellationToken);
-
-            await _botMessageService.AddAsync(new BotMessageModel()
+            if (botMessageGroupModel != null)
             {
-                MessageId = resultMessage.MessageId,
-                CommandGroup = commandGroup,
+                var deletedTasks = new List<Task>();
+
+                foreach (var messageId in botMessageGroupModel.MessageIds)
+                {
+                    deletedTasks.Add(DeleteMessageAsync(botMessageGroupModel.ChatId,messageId,cancellationToken));
+                }
+
+                await Task.WhenAll(deletedTasks);
+            }
+
+            await SendMessageAsync(newMessage, chatId, cancellationToken);
+
+        }
+
+        public async Task SendMessageAsync(ITelegramMessage message, long chatId, CancellationToken cancellationToken = default)
+        {
+            switch (message)
+            {
+                case PhotoMessage photoMessage:
+                    await SendMessageAsync(photoMessage, chatId, cancellationToken);
+                    break;
+                case TextMessage textMessage:
+                    await SendMessageAsync(textMessage, chatId, cancellationToken);
+                    break;
+                case MediaGroupMessage mediaGroupMessage:
+                    await SendMessageAsync(mediaGroupMessage, chatId, cancellationToken);
+                    break;
+                case CombiningMessage combiningMessage:
+                    await SendMessageAsync(combiningMessage, chatId, cancellationToken);
+                    break;
+            }
+        }
+
+        private async Task<List<Message>> SendMessageAsync(CombiningMessage message, long chatId,
+            CancellationToken cancellationToken = default)
+        {
+            var resultMessages = new List<Message>();
+
+            foreach (var childMessage in message.Messages)
+            {
+                switch (childMessage)
+                {
+                    case PhotoMessage photoMessage:
+                        resultMessages.Add( await SendMessageAsync(photoMessage, chatId, cancellationToken));
+                        break;
+                    case TextMessage textMessage:
+                        resultMessages.Add(await SendMessageAsync(textMessage, chatId, cancellationToken));
+                        break;
+                    case MediaGroupMessage mediaGroupMessage:
+                        resultMessages.AddRange(await SendMessageAsync(mediaGroupMessage, chatId, cancellationToken));
+                        break;
+                }
+            }
+
+            await _botMessageGroupService.AddAsync(new BotMessageGroupModel()
+            {
                 ChatId = chatId,
+                MessageIds = resultMessages.Select(x => x.MessageId).ToList()
             });
 
-            return resultMessage;
+            return resultMessages;
         }
 
-        public async Task<Message> SendMessageAsync(PhotoMessage message, long chatId, CancellationToken cancellationToken = default,
-            CommandGroupEnum commandGroup = CommandGroupEnum.None)
+        private async Task<Message> SendMessageAsync(TextMessage message, long chatId, CancellationToken cancellationToken = default)
         {
-            await DeleteBotMessageByCommandGroupAsync(chatId, commandGroup, cancellationToken);
+            return await _botClient.SendTextMessageAsync(chatId, message.Text, replyMarkup: message.ReplyMarkup, parseMode: message.ParseMode,
+                cancellationToken: cancellationToken);
+        }
+
+
+        private async Task<Message> SendMessageAsync(PhotoMessage message, long chatId, CancellationToken cancellationToken = default)
+        {
 
             if (message.Photo == null)
             {
@@ -56,22 +112,12 @@ namespace AnimeNotificationsBot.Api.Services
 
                 message.Photo.Content.Close();
 
-                await _botMessageService.AddAsync(new BotMessageModel()
-                {
-                    MessageId = resultMessage.MessageId,
-                    CommandGroup = commandGroup,
-                    ChatId = chatId,
-                });
-
                 return resultMessage;
             }
         }
 
-        public async Task<List<Message>> SendMessageAsync(MediaGroupMessage message, long chatId, CancellationToken cancellationToken = default,
-            CommandGroupEnum commandGroup = CommandGroupEnum.None)
+        private async Task<List<Message>> SendMessageAsync(MediaGroupMessage message, long chatId, CancellationToken cancellationToken = default)
         {
-            await DeleteBotMessageByCommandGroupAsync(chatId, commandGroup, cancellationToken);
-
             var media = new List<IAlbumInputMedia>();
 
             foreach (var image in message.Images)
@@ -89,20 +135,13 @@ namespace AnimeNotificationsBot.Api.Services
                 image.Image.Content.Close();
             }
 
-            await _botMessageService.AddRangeAsync(resultMessages.Select(x => new BotMessageModel()
-            {
-                MessageId = x.MessageId,
-                ChatId = x.Chat.Id,
-                CommandGroup = commandGroup
-            }).ToList());
-
             return resultMessages.ToList();
         }
 
-        public async Task<Message> EditTextMessageAsync(TextMessage message, long chatId, int messageId,
+        public async Task EditTextMessageAsync(TextMessage message, long chatId, int messageId,
             CancellationToken cancellationToken = default)
         {
-            return await _botClient.EditMessageTextAsync(chatId, messageId, message.Text,
+            await _botClient.EditMessageTextAsync(chatId, messageId, message.Text,
                 replyMarkup: message.ReplyMarkup as InlineKeyboardMarkup, cancellationToken: cancellationToken);
         }
 
@@ -119,27 +158,6 @@ namespace AnimeNotificationsBot.Api.Services
         public async Task DeleteMessageAsync(long chatId, int messageId, CancellationToken cancellationToken = default)
         {
             await _botClient.DeleteMessageAsync(chatId, messageId, cancellationToken);
-
-            await _botMessageService.DeleteAsync(chatId, messageId);
-        }
-
-        private async Task DeleteBotMessageByCommandGroupAsync(long chatId, CommandGroupEnum commandGroup,
-            CancellationToken cancellationToken = default)
-        {
-            if (commandGroup == CommandGroupEnum.None)
-                return;
-
-            var botMessages = await _botMessageService.GetRangeByCommandGroupAsync(chatId, commandGroup);
-
-            var tasks = new List<Task>();
-            foreach (var botMessage in botMessages)
-            {
-                tasks.Add(_botClient.DeleteMessageAsync(chatId, botMessage.MessageId, cancellationToken));
-            }
-
-            await Task.WhenAll(tasks);
-
-            await _botMessageService.DeleteByCommandGroupAsync(chatId, commandGroup);
         }
 
 

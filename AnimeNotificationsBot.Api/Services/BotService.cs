@@ -15,14 +15,22 @@ namespace AnimeNotificationsBot.Api.Services
 
         public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
         {
-            var handler = update switch
+            try
             {
-                { Message: { } } => HandleMessageAsync(update.Message, cancellationToken),
-                { CallbackQuery: { } } => HandleCallbackQueryAsync(update.CallbackQuery, cancellationToken),
-                _ => DefaultHandleAsync(update, cancellationToken)
-            };
+                var handler = update switch
+                {
+                    { Message: { } } => HandleMessageAsync(update.Message, cancellationToken),
+                    { CallbackQuery: { } } => HandleCallbackQueryAsync(update.CallbackQuery, cancellationToken),
+                    _ => DefaultHandleAsync(update, cancellationToken)
+                };
 
-            await handler;
+                await handler;
+            }
+            catch(Exception ex) 
+            {
+
+            }
+            
         }
 
         private async Task HandleMessageAsync(Message message, CancellationToken cancellationToken)
