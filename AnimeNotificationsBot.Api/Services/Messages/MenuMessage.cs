@@ -1,4 +1,5 @@
-﻿using AnimeNotificationsBot.Api.Services.Commands;
+﻿using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands;
+using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -11,7 +12,11 @@ namespace AnimeNotificationsBot.Api.Services.Messages
             var helpMessage = new HelpMessage();
             Text = helpMessage.Text;
             ReplyMarkup = new ReplyKeyboardMarkup(new KeyboardButton[][]{
-                new []{new KeyboardButton(HelpCommand.CreateFriendly()) }
+                new []
+                {
+                    new KeyboardButton(FindAnimeCommand.CreateFriendly()),
+                    new KeyboardButton(HelpCommand.CreateFriendly())
+                }
             })
             {
                 ResizeKeyboard = true

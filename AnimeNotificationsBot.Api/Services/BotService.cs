@@ -1,8 +1,6 @@
-﻿using AnimeNotificationsBot.Api.Services.Commands.Base;
+﻿using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using System.Threading;
 using Telegram.Bot.Types;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace AnimeNotificationsBot.Api.Services
 {
@@ -49,9 +47,9 @@ namespace AnimeNotificationsBot.Api.Services
             await command.ExecuteAsync();
         }
 
-        private async Task DefaultHandleAsync(Update update, CancellationToken cancellationToken)
+        private Task DefaultHandleAsync(Update update, CancellationToken cancellationToken)
         {
-
+            return Task.CompletedTask;
         }
 
     }

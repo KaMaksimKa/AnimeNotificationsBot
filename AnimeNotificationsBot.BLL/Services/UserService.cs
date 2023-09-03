@@ -1,6 +1,7 @@
 ﻿using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.NewFolder.NewFolder;
+using AnimeNotificationsBot.Common.Enums;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
 
@@ -48,6 +49,18 @@ namespace AnimeNotificationsBot.BLL.Services
         {
             var user = await _context.Users.GetUserByTelegramId(telegramUserId);
             user.IsRemoved = true;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<CommandStateEnum> GetCommandStateAsync(long telegramUserId)
+        {
+            return (await _context.Users.GetUserByTelegramId(telegramUserId)).CommandState;
+        }
+
+        public async Task SetCommandStateAsync(long telegramUserId, CommandStateEnum commandState)
+        {
+            var user = await _context.Users.GetUserByTelegramId(telegramUserId);
+            user.CommandState = commandState;
             await _context.SaveChangesAsync();
         }
     }

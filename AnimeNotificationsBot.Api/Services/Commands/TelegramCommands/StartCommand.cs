@@ -1,18 +1,18 @@
-﻿using AnimeNotificationsBot.Api.Services.Commands.Base;
+﻿using AnimeNotificationsBot.Api.Enums;
+using AnimeNotificationsBot.Api.Services.Commands.Base;
+using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.Api.Services.Messages;
-using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.NewFolder.NewFolder;
-using AnimeNotificationsBot.DAL;
 
-namespace AnimeNotificationsBot.Api.Services.Commands
+namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands
 {
-    public class StartCommand:MessageCommand
+    public class StartCommand : MessageCommand
     {
         private readonly IUserService _userService;
         private readonly IBotSender _botSender;
-        private const string _name = "/start";
+        private const string Name = "/start";
 
         public StartCommand(MessageCommandArgs commandArgs, IUserService userService,
              IBotSender botSender) : base(commandArgs)
@@ -21,21 +21,15 @@ namespace AnimeNotificationsBot.Api.Services.Commands
             _botSender = botSender;
         }
 
-        public override bool CanExecute()
+        public override CommandTypeEnum Type => CommandTypeEnum.TextCommand;
+
+        protected override bool CanExecuteCommand()
         {
-            if (CommandArgs.Message.From == null)
-                return false;
-            
-            return CommandArgs.Message.Text == _name;
+            return CommandArgs.Message.Text == Name;
         }
 
-        public override async Task ExecuteAsync()
+        public override async Task ExecuteCommandAsync()
         {
-            if (!CanExecute())
-            {
-                throw new ArgumentException();
-            }
-
             var message = CommandArgs.Message;
             var telegramUser = message.From!;
 
@@ -48,12 +42,9 @@ namespace AnimeNotificationsBot.Api.Services.Commands
                 UserName = telegramUser.Username
             });
 
-            await _botSender.SendMessageAsync(new MenuMessage(),
-                message.Chat.Id, cancellationToken: CommandArgs.CancellationToken);
+            await _botSender.SendMessageAsync(new MenuMessage(), ChatId, cancellationToken: CancellationToken);
         }
-        public static string Create()
-        {
-            return $"{_name}";
-        }
+
+        public static string Create() => Name;
     }
 }

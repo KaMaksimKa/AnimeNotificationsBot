@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AnimeNotificationsBot.Common.Exceptions;
+﻿using AnimeNotificationsBot.Common.Exceptions;
 using AnimeNotificationsBot.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,5 +21,19 @@ namespace AnimeNotificationsBot.BLL.Helpers
             return user;
         }
 
+        public static async Task<User> GetUserByChatId(this DbSet<User> users, long chatId)
+        {
+            var user = await users.FirstOrDefaultAsync(x => x.TelegramChatId == chatId);
+
+            if (user == null)
+                throw new NotFoundEntityException()
+                {
+                    EntityName = nameof(User),
+                    PropertyName = nameof(user.TelegramChatId),
+                    PropertyValue = chatId
+                };
+
+            return user;
+        }
     }
 }

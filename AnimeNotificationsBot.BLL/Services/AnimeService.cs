@@ -4,7 +4,6 @@ using AnimeNotificationsBot.Common.Exceptions;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AnimeNotificationsBot.BLL.Services
 {
@@ -19,15 +18,13 @@ namespace AnimeNotificationsBot.BLL.Services
             _imageService = imageService;
         }
 
-        public async Task<List<AnimeWithImageModel>> GetAnimesWithImagesAsync(string? searchQuery = null, int numberOfPage = 1, int quantity = 5)
+        public async Task<List<AnimeWithImageModel>> GetAnimesWithImagesAsync(string? searchQuery = null)
         {
             var animes = await _context.Animes
                 .Include(x => x.Images)
                 .Where(x => x.TitleRu != null)
                 .Where(x => searchQuery == null || (x.TitleRu != null && x.TitleRu.Contains(searchQuery))
                     || (x.TitleEn != null && x.TitleEn.Contains(searchQuery)))
-                .Skip((numberOfPage - 1) * quantity)
-                .Take(quantity)
                 .ToListAsync();
 
             var animeModels = new List<AnimeWithImageModel>();

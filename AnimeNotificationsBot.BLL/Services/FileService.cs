@@ -1,7 +1,5 @@
-﻿using AnimeNotificationsBot.BLL.Helpers;
-using AnimeNotificationsBot.BLL.Interfaces;
+﻿using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.Common.Models;
-using System.IO;
 
 namespace AnimeNotificationsBot.BLL.Services
 {
@@ -27,23 +25,23 @@ namespace AnimeNotificationsBot.BLL.Services
             await stream.CopyToAsync(fileStream);
         }
 
-        public async Task<FileModel> GetFile(string fileName, params string[] pathFolderParts)
+        public Task<FileModel> GetFile(string fileName, params string[] pathFolderParts)
         {
-            return new FileModel()
+            return Task.FromResult(new FileModel()
             {
                 FileName = fileName,
                 Content = new FileStream(GetPath(fileName, pathFolderParts), FileMode.Open)
-            };
+            });
         }
 
-        public async Task<FileModel> GetFile(params string[] pathParts)
+        public Task<FileModel> GetFile(params string[] pathParts)
         {
             var fileInfo = new FileInfo(Path.Combine(pathParts));
-            return new FileModel()
+            return Task.FromResult(new FileModel()
             {
                 FileName = fileInfo.Name,
                 Content = fileInfo.OpenRead()
-            };
+            });
         }
 
         private string GetPath(string fileName, params string[] pathFolderParts)

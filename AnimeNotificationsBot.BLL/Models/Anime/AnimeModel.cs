@@ -3,6 +3,6 @@
     public class AnimeModel
     {
         public long Id { get; set; }
-        public string TitleRu { get; set; }
+        public required string TitleRu { get; set; }
     }
 }

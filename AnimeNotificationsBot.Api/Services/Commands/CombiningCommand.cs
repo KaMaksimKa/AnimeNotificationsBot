@@ -2,7 +2,7 @@
 
 namespace AnimeNotificationsBot.Api.Services.Commands
 {
-    public class CombiningCommand:ITelegramCommand
+    public class CombiningCommand : ICommand
     {
         private readonly IEnumerable<ITelegramCommand> _commands;
         public CombiningCommand(IEnumerable<ITelegramCommand> commands)
@@ -22,12 +22,9 @@ namespace AnimeNotificationsBot.Api.Services.Commands
                 throw new ArgumentException();
             }
 
-            var commands = _commands.Where(x => x.CanExecute());
+            var command = _commands.OrderBy(x => x.Type).First(x => x.CanExecute());
 
-            foreach (var command in commands)
-            {
-                await command.ExecuteAsync();
-            }
+            await command.ExecuteAsync();
         }
     }
 }

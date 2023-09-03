@@ -1,6 +1,8 @@
 ﻿using AnimeNotificationsBot.Api.Services.Commands;
-using AnimeNotificationsBot.Api.Services.Commands.Anime;
 using AnimeNotificationsBot.Api.Services.Commands.Base;
+using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
+using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands;
+using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.BLL.Interfaces;
 
@@ -19,27 +21,29 @@ namespace AnimeNotificationsBot.Api.Services
             _animeService = animeService;
         }
 
-        public ITelegramCommand CreateCallbackCommand(CallbackCommandArgs commandArgs)
+        public ICommand CreateCallbackCommand(CallbackCommandArgs commandArgs)
         {
             var command = new CombiningCommand(new ITelegramCommand[]
             {
                 new AnimeInfoCommand(commandArgs,_animeService,_botSender)
             });
 
-            return new MainCallbackQueryCommand(commandArgs, command, _botSender);
+            return new MainCommand(commandArgs, command, _botSender);
         }
 
-        public ITelegramCommand CreateMessageCommand(MessageCommandArgs commandArgs)
+        public ICommand CreateMessageCommand(MessageCommandArgs commandArgs)
         {
             var command = new CombiningCommand(new ITelegramCommand[]
             {
                 new StartCommand(commandArgs,_userService,_botSender),
                 new HelpCommand(commandArgs,_botSender),
-                new FindAnimeCommand(commandArgs,_animeService,_botSender),
-                new FoundAnimeCommand(commandArgs,_animeService,_botSender),
+                new FindAnimeCommand(commandArgs,_userService,_botSender),
+                new FoundAnimeCommand(commandArgs,_animeService,_userService,_botSender),
+                new CancelCommand(commandArgs,_userService,_botSender),
+                new MenuCommand(commandArgs,_botSender)
             });
 
-            return new MainMessageCommand(commandArgs, command, _botSender);
+            return new MainCommand(commandArgs, command, _botSender);
         }
     }
 }

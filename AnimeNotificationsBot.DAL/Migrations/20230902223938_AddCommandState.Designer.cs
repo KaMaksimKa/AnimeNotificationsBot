@@ -3,6 +3,7 @@ using System;
 using AnimeNotificationsBot.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AnimeNotificationsBot.DAL.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230902223938_AddCommandState")]
+    partial class AddCommandState
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -369,40 +372,6 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasDatabaseName("ix_anime_types_title");
 
                     b.ToTable("anime_types", (string)null);
-                });
-
-            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.BotMessage", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("CommandGroup")
-                        .HasColumnType("integer")
-                        .HasColumnName("command_group");
-
-                    b.Property<bool>("IsRemoved")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_removed");
-
-                    b.Property<int>("MessageId")
-                        .HasColumnType("integer")
-                        .HasColumnName("message_id");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_bot_messages");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_bot_messages_user_id");
-
-                    b.ToTable("bot_messages", (string)null);
                 });
 
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Dubbing", b =>
@@ -765,18 +734,6 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.BotMessage", b =>
-                {
-                    b.HasOne("AnimeNotificationsBot.DAL.Entities.User", "User")
-                        .WithMany("BotMessages")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_bot_messages_users_user_id");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Image", b =>
                 {
                     b.HasOne("AnimeNotificationsBot.DAL.Entities.Anime", "Anime")
@@ -845,8 +802,6 @@ namespace AnimeNotificationsBot.DAL.Migrations
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.User", b =>
                 {
                     b.Navigation("AnimeSubscriptions");
-
-                    b.Navigation("BotMessages");
                 });
 #pragma warning restore 612, 618
         }

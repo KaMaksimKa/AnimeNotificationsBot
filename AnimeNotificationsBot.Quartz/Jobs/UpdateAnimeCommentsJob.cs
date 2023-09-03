@@ -1,10 +1,4 @@
-﻿using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.DAL;
-using AnimeNotificationsBot.DAL.Entities;
-using AnimeNotificationsBot.Quartz.Services;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using ParserAnimeGO;
+﻿using AnimeNotificationsBot.Quartz.Services;
 using Quartz;
 
 namespace AnimeNotificationsBot.Quartz.Jobs

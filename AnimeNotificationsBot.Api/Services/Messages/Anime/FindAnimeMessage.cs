@@ -1,4 +1,5 @@
-﻿using AnimeNotificationsBot.Api.Services.Messages.Base;
+﻿using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands;
+using AnimeNotificationsBot.Api.Services.Messages.Base;
 
 namespace AnimeNotificationsBot.Api.Services.Messages.Anime
 {
@@ -6,7 +7,11 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Anime
     {
         public FindAnimeMessage()
         {
-            Text = "Отправьте мне название аниме для поиска.";
+            Text = $"""
+                Отправьте мне название аниме для поиска
+    
+                {CancelCommand.Create()} - отменить действие
+                """;
         }
     }
 }

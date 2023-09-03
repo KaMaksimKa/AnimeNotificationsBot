@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AnimeNotificationsBot.Common.Enums;
 using AnimeNotificationsBot.Common.Interfaces;
 
 namespace AnimeNotificationsBot.DAL.Entities
@@ -22,6 +23,9 @@ namespace AnimeNotificationsBot.DAL.Entities
 
         public bool IsRemoved { get; set; }
 
+        public CommandStateEnum CommandState { get; set; } = CommandStateEnum.None;
+
         public virtual List<AnimeSubscription> AnimeSubscriptions { get; set; } = new List<AnimeSubscription>();
+        public virtual List<BotMessage> BotMessages { get; set; } = new List<BotMessage>();
     }
 }

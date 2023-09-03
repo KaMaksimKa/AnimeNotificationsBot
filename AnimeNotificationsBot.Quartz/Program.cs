@@ -1,6 +1,3 @@
-
-
-using AnimeNotificationsBot.BLL;
 using AnimeNotificationsBot.BLL.Configs;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Services;
@@ -8,7 +5,6 @@ using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.Quartz.AutoMapper;
 using AnimeNotificationsBot.Quartz.Configs;
 using AnimeNotificationsBot.Quartz.JobOptions;
-using AnimeNotificationsBot.Quartz.Services;
 using Microsoft.EntityFrameworkCore;
 using ParserAnimeGO;
 using ParserAnimeGO.Interface;
