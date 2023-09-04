@@ -3,6 +3,7 @@ using AnimeNotificationsBot.Api.Services.Commands.Base;
 using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.Api.Services.Messages.Anime;
+using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Enums;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Anime;
@@ -26,14 +27,17 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
         public override CommandTypeEnum Type => CommandTypeEnum.TextCommand;
         protected override bool CanExecuteCommand()
         {
-            return CommandArgs.CallbackQuery.Data?.StartsWith(Name) == true;
+            return GetCommand() == Name;
         }
 
         public override async Task ExecuteCommandAsync()
         {
             var animeArgs = await GetDataAsync<AnimeArgs>();
             var animeListModel = await _animeService.GetAnimeWithImageByArgsAsync(animeArgs);
-            await _botSender.ReplaceMessageAsync(new AnimeListMessage(animeListModel,CallbackQueryDataService), MessageId, ChatId,
+            await _botSender.ReplaceMessageAsync(new AnimeListMessage(animeListModel,CallbackQueryDataService,new BackNavigationArgs()
+                {
+                    ChildrenBackData = await Create(animeArgs,CallbackQueryDataService)
+                }), MessageId, ChatId,
                 CancellationToken);
             await _botSender.AnswerCallbackQueryAsync(CommandArgs.CallbackQuery.Id,
                 cancellationToken: CancellationToken);

@@ -17,7 +17,7 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
 
         public sealed override bool CanExecute()
         {
-            return base.CanExecute() && CanExecuteCommand();
+            return base.CanExecute() && CommandArgs.CallbackQuery.Data != null && CanExecuteCommand();
         }
 
         protected abstract bool CanExecuteCommand();
@@ -34,51 +34,27 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
 
         protected async Task<T> GetDataAsync<T>()
         {
-            var dataId = long.Parse(CommandArgs.CallbackQuery.Data!.Split("?")[1]);
+            var dataId = long.Parse(CommandArgs.CallbackQuery.Data!.Split("&")[0].Split("?")[1]);
             return await CallbackQueryDataService.GetAsync<T>(dataId);
         }
 
-        protected static async Task<string> Create<T>(string name, T data,ICallbackQueryDataService callbackQueryDataService)
+        protected string GetBackCommand()
         {
-            var dataId = await callbackQueryDataService.AddAsync(data);
-            return $"{name}?{dataId}";
+            return CommandArgs.CallbackQuery.Data!.Split("&")[1];
         }
 
-        /*protected static string Create(string name,Dictionary<string, string> args)
+        protected string GetCommand()
         {
-            var textCommand = name;
-            if (args.Any())
-            {
-                var isFirst = true;
-                foreach (var (key,value) in args)
-                {
-                    textCommand += isFirst ? "?" : "&";
-                    textCommand += $"{key}={value}";
+            return CommandArgs.CallbackQuery.Data!.Split("&")[0].Split("?")[0];
+        }
 
-                    isFirst = false;
-                }
-            }
-
-            return textCommand;
-        }*/
-
-        /*private Dictionary<string,string> GetArgs()
+        protected static async Task<string> Create<T>(string name, T data,ICallbackQueryDataService callbackQueryDataService, string? backCommand = null)
         {
-            var argsDictionary = new Dictionary<string,string>();
-            var argsString = CommandArgs.CallbackQuery.Data?.Split("?").LastOrDefault();
-
-            if (argsString != null)
-            {
-                var args = argsString.Split("&");
-                foreach (var arg in args)
-                {
-                    var key = arg.Split("=")[0];
-                    var value = arg.Split("=")[1];
-                    argsDictionary.Add(key,value);
-                }
-            }
-
-            return argsDictionary;
-        }*/
+            var dataId = await callbackQueryDataService.AddAsync(data);
+            var command = $"{name}?{dataId}";
+            if (backCommand != null)
+                command += $"&{backCommand}";
+            return command;
+        }
     }
 }

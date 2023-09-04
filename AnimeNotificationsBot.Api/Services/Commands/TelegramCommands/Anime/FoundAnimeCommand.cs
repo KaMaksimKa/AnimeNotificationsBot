@@ -45,7 +45,13 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
 
             await _userService.SetCommandStateAsync(TelegramUserId, CommandStateEnum.None);
 
-            await _botSender.SendMessageAsync(new AnimeListMessage(animeListModel,_callbackQueryDataService), ChatId, CommandArgs.CancellationToken);
+            await _botSender.SendMessageAsync(new AnimeListMessage(animeListModel,_callbackQueryDataService,new BackNavigationArgs()
+            {
+                ChildrenBackData = await AnimeListCommand.Create(new AnimeArgs()
+                {
+                    SearchQuery = CommandArgs.Message.Text
+                },_callbackQueryDataService)
+            }), ChatId, CommandArgs.CancellationToken);
         }
     }
 }

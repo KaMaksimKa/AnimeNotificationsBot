@@ -11,8 +11,8 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Anime
 {
     public class AnimeListMessage: CombiningMessage
     {
-        private const int MaxCountPageOnMessage = 7;
-        public AnimeListMessage(AnimeListModel model, ICallbackQueryDataService callbackQueryDataService)
+        private const int MaxCountPageOnMessage = 5;
+        public AnimeListMessage(AnimeListModel model, ICallbackQueryDataService callbackQueryDataService,BackNavigationArgs backNavigationArgs)
         {
             var animeImagesMessage = new AnimeImagesMessage(model.Animes);
 
@@ -32,7 +32,7 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Anime
 
             textMessage.Text = $"""
                 Всего Аниме найдено - {model.CountAllAnime}.
-                Страница {model.Args.NumberOfPage} из {model.CountPage}.
+                Страница {model.Args.NumberOfPage} из {model.CountPages}.
                 Сорнировка по {sort} в порядке {order}.
                 """;
 
@@ -42,13 +42,19 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Anime
             {
                 buttons.Add(new List<InlineKeyboardButton>()
                 {
-                    InlineKeyboardButton.WithCallbackData(anime.TitleRu,AnimeInfoCommand.Create(anime.Id,callbackQueryDataService).Result)
+                    InlineKeyboardButton.WithCallbackData(anime.TitleRu,AnimeInfoCommand.Create(anime.Id,callbackQueryDataService,backNavigationArgs.ChildrenBackData).Result)
                 });
             }
 
             var lineWithNumberOfPages = new List<InlineKeyboardButton>();
-            var start = Math.Max(1, model.Args.NumberOfPage-MaxCountPageOnMessage/2);
-            var finish = Math.Min(start + model.CountPage, start + MaxCountPageOnMessage);
+
+            var start = model.Args.NumberOfPage - MaxCountPageOnMessage / 2;
+            if (start < 1)
+                start = 1;
+            else if (start + MaxCountPageOnMessage > model.CountPages)
+                start = Math.Max(1, model.CountPages - MaxCountPageOnMessage + 1);
+
+            var finish = Math.Min(model.CountPages+1, start + MaxCountPageOnMessage);
             for (int numberOfPage = start; numberOfPage < finish; numberOfPage++)
             {
                 var animeArgsForPage = new AnimeArgs()

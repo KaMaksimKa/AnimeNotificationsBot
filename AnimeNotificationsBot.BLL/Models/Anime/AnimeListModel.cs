@@ -6,7 +6,7 @@ namespace AnimeNotificationsBot.BLL.Models.Anime
     {
         public AnimeArgs Args { get; set; } = null!;
         public int CountAllAnime { get; set; }
-        public int CountPage => (int)Math.Ceiling((double)CountAllAnime / Args.CountPerPage);
+        public int CountPages => (int)Math.Ceiling((double)CountAllAnime / Args.CountPerPage);
         public List<AnimeWithImageModel> Animes { get; set; } = null!;
     }
 }

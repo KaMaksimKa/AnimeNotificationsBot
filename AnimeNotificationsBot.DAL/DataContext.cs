@@ -57,6 +57,8 @@ namespace AnimeNotificationsBot.DAL
             modelBuilder.Entity<User>().HasIndex(x => x.TelegramChatId).IsUnique();
 
             modelBuilder.Entity<AnimeNotification>().HasIndex(x => new{x.AnimeId,x.DubbingId,x.SerialNumber}).IsUnique();
+
+            modelBuilder.Entity<BotMessage>().HasIndex(x => x.MessageId).IsUnique();
         }
 
         public static void Configure(DbContextOptionsBuilder optionsBuilder, string dbSettings)

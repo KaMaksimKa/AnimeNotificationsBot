@@ -32,7 +32,7 @@ namespace AnimeNotificationsBot.Api.Services
 
                 foreach (var messageId in botMessageGroupModel.MessageIds)
                 {
-                    deletedTasks.Add(DeleteMessageAsync(botMessageGroupModel.ChatId,messageId,cancellationToken));
+                    deletedTasks.Add(DeleteMessageAsync(botMessageGroupModel.ChatId, messageId, cancellationToken));
                 }
 
                 await Task.WhenAll(deletedTasks);
@@ -44,21 +44,29 @@ namespace AnimeNotificationsBot.Api.Services
 
         public async Task SendMessageAsync(ITelegramMessage message, long chatId, CancellationToken cancellationToken = default)
         {
+            var resultMessages = new List<Message>();
+
             switch (message)
             {
                 case PhotoMessage photoMessage:
-                    await SendMessageAsync(photoMessage, chatId, cancellationToken);
+                    resultMessages.Add(await SendMessageAsync(photoMessage, chatId, cancellationToken));
                     break;
                 case TextMessage textMessage:
-                    await SendMessageAsync(textMessage, chatId, cancellationToken);
+                    resultMessages.Add(await SendMessageAsync(textMessage, chatId, cancellationToken));
                     break;
                 case MediaGroupMessage mediaGroupMessage:
-                    await SendMessageAsync(mediaGroupMessage, chatId, cancellationToken);
+                    resultMessages.AddRange(await SendMessageAsync(mediaGroupMessage, chatId, cancellationToken));
                     break;
                 case CombiningMessage combiningMessage:
-                    await SendMessageAsync(combiningMessage, chatId, cancellationToken);
+                    resultMessages.AddRange(await SendMessageAsync(combiningMessage, chatId, cancellationToken));
                     break;
             }
+
+            await _botMessageGroupService.AddAsync(new BotMessageGroupModel()
+            {
+                ChatId = chatId,
+                MessageIds = resultMessages.Select(x => x.MessageId).ToList()
+            });
         }
 
         private async Task<List<Message>> SendMessageAsync(CombiningMessage message, long chatId,
@@ -71,7 +79,7 @@ namespace AnimeNotificationsBot.Api.Services
                 switch (childMessage)
                 {
                     case PhotoMessage photoMessage:
-                        resultMessages.Add( await SendMessageAsync(photoMessage, chatId, cancellationToken));
+                        resultMessages.Add(await SendMessageAsync(photoMessage, chatId, cancellationToken));
                         break;
                     case TextMessage textMessage:
                         resultMessages.Add(await SendMessageAsync(textMessage, chatId, cancellationToken));
@@ -81,12 +89,6 @@ namespace AnimeNotificationsBot.Api.Services
                         break;
                 }
             }
-
-            await _botMessageGroupService.AddAsync(new BotMessageGroupModel()
-            {
-                ChatId = chatId,
-                MessageIds = resultMessages.Select(x => x.MessageId).ToList()
-            });
 
             return resultMessages;
         }
