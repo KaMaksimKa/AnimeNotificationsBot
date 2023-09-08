@@ -2,7 +2,7 @@
 {
     public class BackNavigationArgs
     {
-        public string? BackData { get; set; }
-        public string? ChildrenBackData { get; set; }
+        public string? PrevCommandData { get; set; }
+        public string? CurrCommandData { get; set; }
     }
 }

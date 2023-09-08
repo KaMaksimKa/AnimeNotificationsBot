@@ -1,13 +1,18 @@
-﻿using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
+﻿using AnimeNotificationsBot.Api.Models;
+using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.BLL.Interfaces;
 
 
 namespace AnimeNotificationsBot.Api.Services.Commands.Base
 {
-    public abstract class CallbackCommand:TelegramCommand
+    public abstract class CallbackCommand<TCommand,TArgs>:TelegramCommand,ICallbackCommand
     {
         protected CallbackCommandArgs CommandArgs;
         protected readonly ICallbackQueryDataService CallbackQueryDataService;
+        protected static readonly string Name = typeof(TCommand).Name;
+
+        private CallbackDataModel<TArgs>? _data;
+
 
         protected CallbackCommand(CallbackCommandArgs commandArgs, ICallbackQueryDataService callbackQueryDataService):base(commandArgs)
         {
@@ -32,29 +37,37 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
 
         public abstract Task ExecuteCommandAsync();
 
-        protected async Task<T> GetDataAsync<T>()
+        protected async Task<CallbackDataModel<TArgs>> GetDataAsync()
         {
-            var dataId = long.Parse(CommandArgs.CallbackQuery.Data!.Split("&")[0].Split("?")[1]);
-            return await CallbackQueryDataService.GetAsync<T>(dataId);
+            if (_data == null)
+            {
+                var dataId = long.Parse(CommandArgs.CallbackQuery.Data!.Split("&")[0].Split("?")[1]);
+                _data = await CallbackQueryDataService.GetAsync<CallbackDataModel<TArgs>>(dataId);
+            }
+            
+            return _data;
         }
 
-        protected string GetBackCommand()
+        protected string GetCurrCommandFromQuery()
         {
-            return CommandArgs.CallbackQuery.Data!.Split("&")[1];
+            return CommandArgs.CallbackQuery.Data!.Split("&")[0];
         }
 
-        protected string GetCommand()
+        protected string GetCommandNameFromQuery()
         {
             return CommandArgs.CallbackQuery.Data!.Split("&")[0].Split("?")[0];
         }
 
-        protected static async Task<string> Create<T>(string name, T data,ICallbackQueryDataService callbackQueryDataService, string? backCommand = null)
+   
+        public static async Task<string> Create(TArgs data,ICallbackQueryDataService callbackQueryDataService, string? backCommand = null)
         {
-            var dataId = await callbackQueryDataService.AddAsync(data);
-            var command = $"{name}?{dataId}";
-            if (backCommand != null)
-                command += $"&{backCommand}";
-            return command;
+            var dataId = await callbackQueryDataService.AddAsync(new CallbackDataModel<TArgs>()
+            {
+                Data = data,
+                PrevStringCommand = backCommand
+            });
+
+            return $"{Name}?{dataId}";
         }
     }
 }

@@ -47,7 +47,7 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
 
             await _botSender.SendMessageAsync(new AnimeListMessage(animeListModel,_callbackQueryDataService,new BackNavigationArgs()
             {
-                ChildrenBackData = await AnimeListCommand.Create(new AnimeArgs()
+                CurrCommandData = await AnimeListCommand.Create(new AnimeArgs()
                 {
                     SearchQuery = CommandArgs.Message.Text
                 },_callbackQueryDataService)

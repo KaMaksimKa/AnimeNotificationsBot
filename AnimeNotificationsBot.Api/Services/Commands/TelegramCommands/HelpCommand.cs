@@ -17,7 +17,7 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands
             _botSender = botSender;
         }
 
-        public override CommandTypeEnum Type => CommandTypeEnum.TextCommand;
+        public override CommandTypeEnum Type => CommandTypeEnum.Command;
 
         protected override bool CanExecuteCommand()
         {

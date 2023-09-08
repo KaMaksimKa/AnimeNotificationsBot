@@ -2,10 +2,10 @@
 
 namespace AnimeNotificationsBot.Api.Services.Commands.Base
 {
-    public abstract class MessageCommand:TelegramCommand
+    public abstract class MessageCommand : TelegramCommand, IMessageCommand
     {
         protected MessageCommandArgs CommandArgs;
-        protected MessageCommand(MessageCommandArgs commandArgs):base(commandArgs)
+        protected MessageCommand(MessageCommandArgs commandArgs) : base(commandArgs)
         {
             CommandArgs = commandArgs;
         }

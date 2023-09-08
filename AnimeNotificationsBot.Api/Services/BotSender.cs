@@ -69,6 +69,37 @@ namespace AnimeNotificationsBot.Api.Services
             });
         }
 
+        public async Task EditTextMessageAsync(TextMessage message, int messageId, long chatId,
+            CancellationToken cancellationToken = default)
+        {
+            await _botClient.EditMessageTextAsync(chatId, messageId, message.Text,
+                replyMarkup: message.ReplyMarkup as InlineKeyboardMarkup, cancellationToken: cancellationToken);
+        }
+
+        public async Task EditReplyMarkupAsync(TextMessage message, int messageId, long chatId,
+            CancellationToken cancellationToken = default)
+        {
+            await _botClient.EditMessageReplyMarkupAsync(chatId, messageId, 
+                replyMarkup: message.ReplyMarkup as InlineKeyboardMarkup, cancellationToken: cancellationToken);
+        }
+
+
+        public async Task AnswerCallbackQueryAsync(string callbackQueryId, CallbackQueryAnswer? answer = null, CancellationToken cancellationToken = default)
+        {
+            await _botClient.AnswerCallbackQueryAsync(callbackQueryId, answer?.Text, answer?.ShowAlert, cancellationToken: cancellationToken);
+        }
+
+        public async Task DeleteReplyMarkup(long chatId, int messageId, CancellationToken cancellationToken = default)
+        {
+            await _botClient.EditMessageReplyMarkupAsync(chatId, messageId, cancellationToken: cancellationToken);
+        }
+
+        public async Task DeleteMessageAsync(long chatId, int messageId, CancellationToken cancellationToken = default)
+        {
+            await _botClient.DeleteMessageAsync(chatId, messageId, cancellationToken);
+        }
+
+
         private async Task<List<Message>> SendMessageAsync(CombiningMessage message, long chatId,
             CancellationToken cancellationToken = default)
         {
@@ -139,29 +170,6 @@ namespace AnimeNotificationsBot.Api.Services
 
             return resultMessages.ToList();
         }
-
-        public async Task EditTextMessageAsync(TextMessage message, long chatId, int messageId,
-            CancellationToken cancellationToken = default)
-        {
-            await _botClient.EditMessageTextAsync(chatId, messageId, message.Text,
-                replyMarkup: message.ReplyMarkup as InlineKeyboardMarkup, cancellationToken: cancellationToken);
-        }
-
-        public async Task AnswerCallbackQueryAsync(string callbackQueryId, CallbackQueryAnswer? answer = null, CancellationToken cancellationToken = default)
-        {
-            await _botClient.AnswerCallbackQueryAsync(callbackQueryId, answer?.Text, answer?.ShowAlert, cancellationToken: cancellationToken);
-        }
-
-        public async Task DeleteReplyMarkup(long chatId, int messageId, CancellationToken cancellationToken = default)
-        {
-            await _botClient.EditMessageReplyMarkupAsync(chatId, messageId, cancellationToken: cancellationToken);
-        }
-
-        public async Task DeleteMessageAsync(long chatId, int messageId, CancellationToken cancellationToken = default)
-        {
-            await _botClient.DeleteMessageAsync(chatId, messageId, cancellationToken);
-        }
-
 
     }
 }

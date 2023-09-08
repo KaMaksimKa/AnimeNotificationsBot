@@ -22,8 +22,14 @@ namespace AnimeNotificationsBot.DAL.Entities
         public string? NextEpisode { get; set; }
         public string? Duration { get; set; }
         public long? IdForComments { get; set; }
+
+        public long? StatusId { get; set; }
         public AnimeStatus? Status { get; set; }
+
+        public long? MpaaRateId { get; set; }
         public MpaaRate? MpaaRate { get; set; }
+
+        public long? TypeId { get; set; }
         public AnimeType? Type { get; set; }
 
         public virtual List<Studio> Studios { get; set; } = new List<Studio>();

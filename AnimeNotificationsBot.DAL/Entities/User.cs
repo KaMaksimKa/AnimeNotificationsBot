@@ -26,6 +26,6 @@ namespace AnimeNotificationsBot.DAL.Entities
         public CommandStateEnum CommandState { get; set; } = CommandStateEnum.None;
 
         public virtual List<AnimeSubscription> AnimeSubscriptions { get; set; } = new List<AnimeSubscription>();
-        public virtual List<BotMessage> BotMessages { get; set; } = new List<BotMessage>();
+        public virtual List<BotMessageGroup> BotMessageGroups { get; set; } = new List<BotMessageGroup>();
     }
 }

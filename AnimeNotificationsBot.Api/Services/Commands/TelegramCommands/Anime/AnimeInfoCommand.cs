@@ -9,11 +9,10 @@ using AnimeNotificationsBot.Common.Enums;
 
 namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
 {
-    public class AnimeInfoCommand : CallbackCommand
+    public class AnimeInfoCommand : CallbackCommand<AnimeInfoCommand,long>
     {
         private readonly IAnimeService _animeService;
         private readonly IBotSender _botSender;
-        private const string Name = "/anime_info";
 
         public AnimeInfoCommand(CallbackCommandArgs commandArgs, IAnimeService animeService, IBotSender botSender,
             ICallbackQueryDataService callbackQueryDataService) : base(commandArgs,callbackQueryDataService)
@@ -22,30 +21,26 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
             _botSender = botSender;
         }
 
-        public override CommandTypeEnum Type => CommandTypeEnum.TextCommand;
+        public override CommandTypeEnum Type => CommandTypeEnum.Command;
 
         protected override bool CanExecuteCommand()
         {
-            return GetCommand() == Name;
+            return GetCommandNameFromQuery() == Name;
         }
 
         public override async Task ExecuteCommandAsync()
         {
-            var animeId = await GetDataAsync<long>();
+            var data = await GetDataAsync();
+            var animeId = data.Data;
 
-            var anime = await _animeService.GetAnimeWithImageAsync(animeId);
+            var model = await _animeService.GetAnimeInfoModel(animeId);
 
-            await _botSender.ReplaceMessageAsync(new AnimeInfoMessage(anime,new BackNavigationArgs()
+            await _botSender.ReplaceMessageAsync(new AnimeInfoMessage(model, new BackNavigationArgs()
             {
-                ChildrenBackData = GetBackCommand()
-            }),MessageId, ChatId,CancellationToken);
+                PrevCommandData = data.PrevStringCommand,
+                CurrCommandData = GetCurrCommandFromQuery()
+            },CallbackQueryDataService),MessageId, ChatId,CancellationToken);
             await _botSender.AnswerCallbackQueryAsync(CommandArgs.CallbackQuery.Id, cancellationToken: CancellationToken);
-        }
-
-
-        public static async Task<string> Create(long animeId,ICallbackQueryDataService callbackQueryDataService,string? backCommand = null)
-        {
-            return await Create(Name,animeId, callbackQueryDataService, backCommand);
         }
     }
 }

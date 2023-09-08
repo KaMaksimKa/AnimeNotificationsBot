@@ -2,7 +2,7 @@
 {
     public enum CommandTypeEnum
     {
-        TextCommand,
+        Command,
         TextAnswer
     }
 }

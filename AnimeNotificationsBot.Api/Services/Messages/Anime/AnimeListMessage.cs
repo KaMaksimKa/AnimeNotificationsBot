@@ -42,7 +42,7 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Anime
             {
                 buttons.Add(new List<InlineKeyboardButton>()
                 {
-                    InlineKeyboardButton.WithCallbackData(anime.TitleRu,AnimeInfoCommand.Create(anime.Id,callbackQueryDataService,backNavigationArgs.ChildrenBackData).Result)
+                    InlineKeyboardButton.WithCallbackData(anime.TitleRu,AnimeInfoCommand.Create(anime.Id,callbackQueryDataService,backNavigationArgs.CurrCommandData).Result)
                 });
             }
 

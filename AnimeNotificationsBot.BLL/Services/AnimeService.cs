@@ -1,4 +1,5 @@
 ﻿using AnimeNotificationsBot.BLL.Enums;
+using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Anime;
 using AnimeNotificationsBot.Common.Exceptions;
@@ -17,32 +18,6 @@ namespace AnimeNotificationsBot.BLL.Services
         {
             _context = context;
             _imageService = imageService;
-        }
-
-        public async Task<List<AnimeWithImageModel>> GetAnimesWithImagesAsync(string? searchQuery = null)
-        {
-            var animes = await _context.Animes
-                .Include(x => x.Images)
-                .Where(x => x.TitleRu != null)
-                .Where(x => searchQuery == null || (x.TitleRu != null && x.TitleRu.Contains(searchQuery))
-                    || (x.TitleEn != null && x.TitleEn.Contains(searchQuery)))
-                .ToListAsync();
-
-            var animeModels = new List<AnimeWithImageModel>();
-
-            foreach (var anime in animes)
-            {
-                var image = anime.Images.FirstOrDefault();
-                animeModels.Add(new AnimeWithImageModel
-                {
-                    Id = anime.Id,
-                    TitleRu = anime.TitleRu!,
-                    Rate = anime.Rate,
-                    Image = image == null ? null : await _imageService.GetImage(image.Path),
-                });
-            }
-
-            return animeModels;
         }
 
         public async Task<AnimeWithImageModel> GetAnimeWithImageAsync(long id)
@@ -79,14 +54,6 @@ namespace AnimeNotificationsBot.BLL.Services
             var query = _context.Animes
                 .Include(x => x.Images)
                 .Where(x => x.TitleRu != null);
-                /*.Select(x => new
-                {
-                    x.Id,
-                    x.TitleRu,
-                    x.TitleEn,
-                    x.Rate,
-                    x.Images
-                });*/
 
             if (!string.IsNullOrEmpty(args.SearchQuery))
             {
@@ -139,6 +106,21 @@ namespace AnimeNotificationsBot.BLL.Services
             animeListModel.Animes = animeModels;
 
             return animeListModel;
+        }
+
+        public async Task<AnimeInfoModel> GetAnimeInfoModel(long animeId)
+        {
+            var anime = await GetAnimeWithImageAsync(animeId);
+            var showNotification = await _context.AnimeNotifications
+                .AnyAsync(
+                    x => x.AnimeId == animeId && x.CreatedDate > DateTimeOffset.UtcNow.AddDays(-14));
+
+            return new AnimeInfoModel()
+            {
+                Anime = anime,
+                ShowNotification = showNotification
+            };
+
         }
     }
 }

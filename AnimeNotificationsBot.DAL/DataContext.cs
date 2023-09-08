@@ -19,6 +19,7 @@ namespace AnimeNotificationsBot.DAL
         public DbSet<BotMessage> BotMessages { get; set; } = null!;
         public DbSet<BotMessageGroup> BotMessageGroups { get; set; } = null!;
         public DbSet<CallbackQueryData> CallbackQueryData { get; set; } = null!;
+        public DbSet<AnimeSubscription> AnimeSubscriptions { get; set; } = null!;
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

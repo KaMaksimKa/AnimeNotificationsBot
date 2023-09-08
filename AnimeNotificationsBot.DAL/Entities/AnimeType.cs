@@ -2,11 +2,10 @@
 
 namespace AnimeNotificationsBot.DAL.Entities
 {
-    public class AnimeType: IRemoveEntity, ITitleEntity
+    public class AnimeType: IEntity, ITitleEntity
     {
         public long Id { get; set; }
-        public required string Title { get; set; } 
-        public bool IsRemoved { get; set; }
+        public required string Title { get; set; }
 
         public virtual List<Anime> Animes { get; set; } = null!;
         

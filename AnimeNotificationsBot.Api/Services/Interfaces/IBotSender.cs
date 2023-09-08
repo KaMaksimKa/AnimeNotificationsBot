@@ -11,8 +11,11 @@ namespace AnimeNotificationsBot.Api.Services.Interfaces
         public Task SendMessageAsync(ITelegramMessage message, long chatId,
             CancellationToken cancellationToken = default);
 
-        public Task EditTextMessageAsync(TextMessage message, long chatId,
-            int messageId, CancellationToken cancellationToken = default);
+        public Task EditTextMessageAsync(TextMessage message, int messageId, long chatId,
+            CancellationToken cancellationToken = default);
+
+        public Task EditReplyMarkupAsync(TextMessage message, int messageId, long chatId,
+            CancellationToken cancellationToken = default);
 
         public Task AnswerCallbackQueryAsync(string callbackQueryId, CallbackQueryAnswer? answer = null,
             CancellationToken cancellationToken = default);
