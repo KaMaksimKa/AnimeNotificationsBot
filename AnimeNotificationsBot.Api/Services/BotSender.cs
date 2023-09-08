@@ -5,7 +5,6 @@ using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.BotMessageGroup;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace AnimeNotificationsBot.Api.Services
@@ -140,7 +139,7 @@ namespace AnimeNotificationsBot.Api.Services
             }
             else
             {
-                var resultMessage = await _botClient.SendPhotoAsync(chatId, new InputOnlineFile(message.Photo.Content, message.Photo.FileName), message.Text, replyMarkup: message.ReplyMarkup,
+                var resultMessage = await _botClient.SendPhotoAsync(chatId, new InputFileStream(message.Photo.Content, message.Photo.FileName),caption: message.Text, replyMarkup: message.ReplyMarkup,
                     cancellationToken: cancellationToken);
 
                 message.Photo.Content.Close();
@@ -155,7 +154,7 @@ namespace AnimeNotificationsBot.Api.Services
 
             foreach (var image in message.Images)
             {
-                media.Add(new InputMediaPhoto(new InputMedia(image.Image.Content, image.Image.FileName))
+                media.Add(new InputMediaPhoto(new InputFileStream(image.Image.Content, image.Image.FileName))
                 {
                     Caption = image.Caption,
                 });
