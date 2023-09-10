@@ -95,7 +95,14 @@ namespace AnimeNotificationsBot.Api.Services
 
         public async Task DeleteMessageAsync(long chatId, int messageId, CancellationToken cancellationToken = default)
         {
-            await _botClient.DeleteMessageAsync(chatId, messageId, cancellationToken);
+            try
+            {
+                await _botClient.DeleteMessageAsync(chatId, messageId, cancellationToken);
+            }
+            catch
+            {
+
+            }
         }
 
 
