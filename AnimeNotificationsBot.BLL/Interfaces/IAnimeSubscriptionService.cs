@@ -1,4 +1,6 @@
-﻿using AnimeNotificationsBot.BLL.Models.Subscriptions;
+﻿using AnimeNotificationsBot.BLL.Models;
+using AnimeNotificationsBot.BLL.Models.Animes;
+using AnimeNotificationsBot.BLL.Models.Subscriptions;
 
 namespace AnimeNotificationsBot.BLL.Interfaces
 {
@@ -6,6 +8,7 @@ namespace AnimeNotificationsBot.BLL.Interfaces
     {
         Task<SubscribedAnimeModel> SubscribeAsync(SubscribeAnimeModel model, long telegramUserId);
         Task<SubscribedAnimeModel> UnsubscribeAsync(SubscribeAnimeModel model, long telegramUserId);
-        Task<List<SubscriptionDubbingModel>> GetSubscriptionsAsync(long animeId, long telegramUserId);
+        Task<List<SubscriptionDubbingModel>> GetUserSubscriptionsByAnimeAsync(long animeId, long telegramUserId);
+        Task<UserSubscriptionListModel> GetUserSubscriptionsListModelAsync(PaginationModel pagination,long telegramUserId);
     }
 }

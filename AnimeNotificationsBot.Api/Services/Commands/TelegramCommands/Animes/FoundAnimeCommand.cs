@@ -1,15 +1,14 @@
 ﻿using AnimeNotificationsBot.Api.Enums;
-using AnimeNotificationsBot.Api.Models;
 using AnimeNotificationsBot.Api.Services.Commands.Base;
 using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages.Anime;
+using AnimeNotificationsBot.Api.Services.Messages.Animes;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.Common.Enums;
 
-namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
+namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Animes
 {
     public class FoundAnimeCommand : MessageCommand
     {
@@ -59,10 +58,6 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
             {
                 await _botSender.SendMessageAsync(new NotFoundAnimeMessage(), ChatId, CancellationToken);
             }
-
-            
-
-            
         }
     }
 }

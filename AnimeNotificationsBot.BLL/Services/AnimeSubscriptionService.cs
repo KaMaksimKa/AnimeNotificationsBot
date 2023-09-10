@@ -1,21 +1,28 @@
 ﻿using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
+using AnimeNotificationsBot.BLL.Models;
+using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.BLL.Models.Dubbing;
 using AnimeNotificationsBot.BLL.Models.Subscriptions;
 using AnimeNotificationsBot.Common.Exceptions;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace AnimeNotificationsBot.BLL.Services
 {
     public class AnimeSubscriptionService : IAnimeSubscriptionService
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public AnimeSubscriptionService(DataContext context)
+        public AnimeSubscriptionService(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<SubscribedAnimeModel> SubscribeAsync(SubscribeAnimeModel model, long telegramUserId)
@@ -78,7 +85,7 @@ namespace AnimeNotificationsBot.BLL.Services
             };
         }
 
-        public async Task<List<SubscriptionDubbingModel>> GetSubscriptionsAsync(long animeId, long telegramUserId)
+        public async Task<List<SubscriptionDubbingModel>> GetUserSubscriptionsByAnimeAsync(long animeId, long telegramUserId)
         {
             var user = await _context.Users.GetUserByTelegramId(telegramUserId);
 
@@ -97,6 +104,30 @@ namespace AnimeNotificationsBot.BLL.Services
                 }).ToListAsync();
 
             return subs;
+        }
+
+        public async Task<UserSubscriptionListModel> GetUserSubscriptionsListModelAsync(PaginationModel pagination,long telegramUserId)
+        {
+            var user = await _context.Users.GetUserByTelegramId(telegramUserId);
+
+            var query = _context.AnimeSubscriptions
+                .Where(x => !x.IsRemoved
+                            && x.UserId == user.Id
+                            && x.Anime.AnimeNotifications.Any(y => y.CreatedDate > DateTimeOffset.UtcNow.AddDays(-14)))
+                .Select(x => x.Anime)
+                .Distinct();
+                
+
+            return new UserSubscriptionListModel()
+            {
+                CountAllAnime = query.Count(),
+                Pagination = pagination,
+                Animes = query
+                    .Skip((pagination.NumberOfPage-1)*pagination.CountPerPage)
+                    .Take(pagination.CountPerPage)
+                    .ProjectTo<AnimeModel>(_mapper.ConfigurationProvider)
+                    .ToList(),
+        };
         }
     }
 }

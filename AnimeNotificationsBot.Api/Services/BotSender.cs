@@ -146,7 +146,7 @@ namespace AnimeNotificationsBot.Api.Services
             }
             else
             {
-                return await _botClient.SendPhotoAsync(chatId, new InputFileUrl(message.ImgHref),caption: message.Text, replyMarkup: message.ReplyMarkup,
+                return await _botClient.SendPhotoAsync(chatId, new InputFileUrl(message.ImgHref),caption: message.Text,parseMode:message.ParseMode, replyMarkup: message.ReplyMarkup,
                     cancellationToken: cancellationToken);
             }
         }

@@ -24,10 +24,6 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Subscript
         }
 
         public override CommandTypeEnum Type => CommandTypeEnum.Command;
-        protected override bool CanExecuteCommand()
-        {
-            return GetCommandNameFromQuery() == Name;
-        }
 
         public override async Task ExecuteCommandAsync()
         {
@@ -39,15 +35,12 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Subscript
                 await _subscriptionService.SubscribeAsync(subAnimeModel.SubscribeAnimeModel, TelegramUserId);
 
             var anime = await _animeService.GetAnimeWithImageAsync(subAnimeModel.SubscribeAnimeModel.AnimeId!.Value);
-            var subDubbing = await _subscriptionService.GetSubscriptionsAsync(subAnimeModel.SubscribeAnimeModel.AnimeId.Value,
+            var subDubbing = await _subscriptionService.GetUserSubscriptionsByAnimeAsync(subAnimeModel.SubscribeAnimeModel.AnimeId.Value,
                 TelegramUserId);
 
             await _botSender.AnswerCallbackQueryAsync(CommandArgs.CallbackQuery.Id, cancellationToken: CancellationToken);
             await _botSender.EditReplyMarkupAsync(new ListDubbingForSubMessage(anime, subDubbing, subAnimeModel.SubscribeAnimeModel,
-                new BackNavigationArgs()
-                {
-                    PrevCommandData = data.PrevStringCommand
-                },CallbackQueryDataService), MessageId, ChatId, CancellationToken);
+                await GetBackNavigationArgs(), CallbackQueryDataService), MessageId, ChatId, CancellationToken);
         }
 
     }

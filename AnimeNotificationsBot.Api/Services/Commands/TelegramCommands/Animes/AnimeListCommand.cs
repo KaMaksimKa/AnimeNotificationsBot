@@ -2,13 +2,12 @@
 using AnimeNotificationsBot.Api.Services.Commands.Base;
 using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages.Anime;
+using AnimeNotificationsBot.Api.Services.Messages.Animes;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Animes;
 
-
-namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
+namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Animes
 {
     public class AnimeListCommand : CallbackCommand<AnimeListCommand, AnimeArgs>
     {
@@ -23,20 +22,14 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
         }
 
         public override CommandTypeEnum Type => CommandTypeEnum.Command;
-        protected override bool CanExecuteCommand()
-        {
-            return GetCommandNameFromQuery() == Name;
-        }
 
         public override async Task ExecuteCommandAsync()
         {
             var data = await GetDataAsync();
             var animeArgs = data.Data;
             var animeListModel = await _animeService.GetAnimeWithImageByArgsAsync(animeArgs);
-            await _botSender.ReplaceMessageAsync(new AnimeListMessage(animeListModel,CallbackQueryDataService,new BackNavigationArgs()
-                {
-                    CurrCommandData = await Create(animeArgs,CallbackQueryDataService)
-                }), MessageId, ChatId,
+            await _botSender.ReplaceMessageAsync(new AnimeListMessage(animeListModel,CallbackQueryDataService,await GetBackNavigationArgs()),
+                MessageId, ChatId,
                 CancellationToken);
             await _botSender.AnswerCallbackQueryAsync(CommandArgs.CallbackQuery.Id,
                 cancellationToken: CancellationToken);

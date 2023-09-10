@@ -40,6 +40,7 @@ namespace AnimeNotificationsBot.DAL.Entities
         public virtual List<AnimeComment> Comments { get; set; } = new List<AnimeComment>();
         public virtual List<AnimeSubscription> AnimeSubscriptions { get; set; } = new List<AnimeSubscription>();
         public virtual List<Image> Images { get; set; } = new List<Image>();
+        public virtual List<AnimeNotification> AnimeNotifications { get; set; } = new List<AnimeNotification>();
 
     }
 }

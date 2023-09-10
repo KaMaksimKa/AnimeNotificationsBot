@@ -6,5 +6,6 @@ namespace AnimeNotificationsBot.Common.Enums
     {
         None = 0,
         FindAnime,
+        SendFeedback
     }
 }

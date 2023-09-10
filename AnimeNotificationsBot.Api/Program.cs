@@ -42,6 +42,8 @@ builder.Services.AddScoped<ICallbackQueryDataService, CallbackQueryDataService>(
 builder.Services.AddScoped<IAnimeSubscriptionService, AnimeSubscriptionService>();
 builder.Services.AddScoped<IDubbingService, DubbingService>();
 builder.Services.AddScoped<IAnimeNotificationService, AnimeNotificationService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+
 
 builder.Services.AddQuartz();
 builder.Services.AddQuartzHostedService();

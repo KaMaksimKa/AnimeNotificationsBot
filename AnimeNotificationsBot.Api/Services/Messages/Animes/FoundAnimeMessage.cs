@@ -1,12 +1,10 @@
-﻿using AnimeNotificationsBot.Api.Models;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime;
-using AnimeNotificationsBot.Api.Services.Messages.Animes;
+﻿using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Animes;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Animes;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace AnimeNotificationsBot.Api.Services.Messages.Anime
+namespace AnimeNotificationsBot.Api.Services.Messages.Animes
 {
     public class FoundAnimeMessage: CombiningMessage
     {

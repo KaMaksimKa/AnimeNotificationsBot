@@ -1,12 +1,12 @@
-﻿using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime;
+﻿using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Animes;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Enums;
-using AnimeNotificationsBot.Api.Services.Messages.Animes;
 using AnimeNotificationsBot.BLL.Interfaces;
+using AnimeNotificationsBot.BLL.Models;
 using AnimeNotificationsBot.BLL.Models.Animes;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace AnimeNotificationsBot.Api.Services.Messages.Anime
+namespace AnimeNotificationsBot.Api.Services.Messages.Animes
 {
     public class AnimeListMessage: CombiningMessage
     {
@@ -31,7 +31,7 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Anime
 
             textMessage.Text = $"""
                 Всего Аниме найдено - {model.CountAllAnime}.
-                Страница {model.Args.NumberOfPage} из {model.CountPages}.
+                Страница {model.Args.Pagination.NumberOfPage} из {model.CountPages}.
                 Сорнировка по {sort} в порядке {order}.
                 """;
 
@@ -45,33 +45,39 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Anime
                 });
             }
 
-            var lineWithNumberOfPages = new List<InlineKeyboardButton>();
-
-            var start = model.Args.NumberOfPage - MaxCountPageOnMessage / 2;
-            if (start < 1)
-                start = 1;
-            else if (start + MaxCountPageOnMessage > model.CountPages)
-                start = Math.Max(1, model.CountPages - MaxCountPageOnMessage + 1);
-
-            var finish = Math.Min(model.CountPages+1, start + MaxCountPageOnMessage);
-            for (int numberOfPage = start; numberOfPage < finish; numberOfPage++)
+            if (model.Animes.Count > MaxCountPageOnMessage)
             {
-                var animeArgsForPage = new AnimeArgs()
+                var lineWithNumberOfPages = new List<InlineKeyboardButton>();
+
+                var start = model.Args.Pagination.NumberOfPage - MaxCountPageOnMessage / 2;
+                if (start < 1)
+                    start = 1;
+                else if (start + MaxCountPageOnMessage > model.CountPages)
+                    start = Math.Max(1, model.CountPages - MaxCountPageOnMessage + 1);
+
+                var finish = Math.Min(model.CountPages + 1, start + MaxCountPageOnMessage);
+                for (int numberOfPage = start; numberOfPage < finish; numberOfPage++)
                 {
-                    SortOrder = model.Args.SortOrder,
-                    SortType = model.Args.SortType,
-                    CountPerPage = model.Args.CountPerPage,
-                    NumberOfPage = numberOfPage,
-                    SearchQuery = model.Args.SearchQuery,
-                };
+                    var animeArgsForPage = new AnimeArgs()
+                    {
+                        SortOrder = model.Args.SortOrder,
+                        SortType = model.Args.SortType,
+                        Pagination = new PaginationModel()
+                        {
+                            CountPerPage = model.Args.Pagination.CountPerPage,
+                            NumberOfPage = numberOfPage
+                        },
+                        SearchQuery = model.Args.SearchQuery,
+                    };
 
-                var nameButtonPage = numberOfPage == model.Args.NumberOfPage?$"✅{numberOfPage}" :numberOfPage.ToString();
+                    var nameButtonPage = numberOfPage == model.Args.Pagination.NumberOfPage ? $"✅{numberOfPage}" : numberOfPage.ToString();
 
-                lineWithNumberOfPages.Add(InlineKeyboardButton.WithCallbackData(nameButtonPage, AnimeListCommand.Create(animeArgsForPage, callbackQueryDataService).Result));
+                    lineWithNumberOfPages.Add(InlineKeyboardButton.WithCallbackData(nameButtonPage, AnimeListCommand.Create(animeArgsForPage, callbackQueryDataService).Result));
+                }
+
+                buttons.Add(lineWithNumberOfPages);
             }
-
-            buttons.Add(lineWithNumberOfPages);
-
+            
             textMessage.ReplyMarkup = new InlineKeyboardMarkup(buttons);
 
             Messages.Add(animeImagesMessage);

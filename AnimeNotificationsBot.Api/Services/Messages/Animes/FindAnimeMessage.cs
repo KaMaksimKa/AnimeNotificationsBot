@@ -1,7 +1,7 @@
 ﻿using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 
-namespace AnimeNotificationsBot.Api.Services.Messages.Anime
+namespace AnimeNotificationsBot.Api.Services.Messages.Animes
 {
     public class FindAnimeMessage: TextMessage
     {

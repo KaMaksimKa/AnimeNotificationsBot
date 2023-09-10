@@ -36,10 +36,27 @@ namespace AnimeNotificationsBot.Quartz.Services
                 .ToList();
 
             var animes = await _context.Animes
+                .Include(x => x.DubbingFromFirstEpisode)
                 .Where(x => notificationsFromParser
                     .Select(y => y.IdFromAnimeGo)
                     .Contains(x.IdFromAnimeGo))
                 .ToListAsync();
+
+            var newAnimesIdsFromAnimeGo = notificationsFromParser
+                .Where(x => x.IdFromAnimeGo.HasValue && animes.All(y => y.IdFromAnimeGo != x.IdFromAnimeGo))
+                .Select(x => x.IdFromAnimeGo!.Value)
+                .ToList();
+
+            if (newAnimesIdsFromAnimeGo.Any())
+            {
+                var newAnimesFromParser = await _parser.GetFullAnimesRangeAsync(newAnimesIdsFromAnimeGo);
+                var newAnimes = newAnimesFromParser.Select(x => _mapper.Map<Anime>(x)).ToList();
+                var newPreparedAnimes = await PrepareAnimesForAddToContext(newAnimes);
+                await AddOrUpdateAnimesInContext(newPreparedAnimes);
+
+                animes.AddRange(newPreparedAnimes);
+            }
+
 
             var dubbing = await _context.Dubbing
                 .Where(x => notificationsFromParser
@@ -47,10 +64,30 @@ namespace AnimeNotificationsBot.Quartz.Services
                     .Contains(x.Title))
                 .ToListAsync();
 
+            var newDubbingTitles = notificationsFromParser
+                .Where(x => x.Dubbing != null && dubbing.All(y => y.Title != x.Dubbing))
+                .Select(x => x.Dubbing!)
+                .ToList();
+
+            if (newDubbingTitles.Any())
+            {
+                var newDubbing = newDubbingTitles.Select(x => new Dubbing()
+                {
+                    Title = x
+                }).ToList();
+
+                await _context.Dubbing.AddRangeAsync(newDubbing);
+
+                await _context.SaveChangesAsync();
+
+                dubbing.AddRange(newDubbing);
+            }
+
             foreach (var notificationFromParser in notificationsFromParser)
             {
                 var anime = animes.FirstOrDefault(x => x.IdFromAnimeGo == notificationFromParser.IdFromAnimeGo);
                 var dub = dubbing.FirstOrDefault(x => x.Title == notificationFromParser.Dubbing);
+
                 var notification = await _context.AnimeNotifications
                         .Where(x => notificationFromParser.IdFromAnimeGo == x.Anime.IdFromAnimeGo
                                     && notificationFromParser.Dubbing == x.Dubbing.Title
@@ -154,7 +191,12 @@ namespace AnimeNotificationsBot.Quartz.Services
                 anime.Genres = await PrepareForAddToContext(anime.Genres, genres);
                 anime.Studios = await PrepareForAddToContext(anime.Studios, studios);
                 anime.Dubbing = await PrepareForAddToContext(anime.Dubbing, dubbing);
-                anime.DubbingFromFirstEpisode = await PrepareForAddToContext(anime.DubbingFromFirstEpisode, dubbing);
+
+                if (anime.DubbingFromFirstEpisode.Any())
+                    anime.DubbingFromFirstEpisode = await PrepareForAddToContext(anime.DubbingFromFirstEpisode, dubbing);
+                else
+                    anime.DubbingFromFirstEpisode = await PrepareForAddToContext(anime.Dubbing, dubbing);
+
             }
 
             return animes;
@@ -217,10 +259,6 @@ namespace AnimeNotificationsBot.Quartz.Services
                 if (_animes.FirstOrDefault(x => anime.IdFromAnimeGo == x.IdFromAnimeGo) is
                     { } animeFromDb)
                 {
-                    if (animeFromDb.IdFromAnimeGo == 2379)
-                    {
-
-                    }
                     _mapper.Map(anime, animeFromDb);
                     _context.Animes.Update(animeFromDb);
                 }

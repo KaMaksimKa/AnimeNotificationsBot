@@ -6,26 +6,21 @@ using AnimeNotificationsBot.Api.Services.Messages.Animes;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
 
-namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
+namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Animes
 {
-    public class AnimeInfoCommand : CallbackCommand<AnimeInfoCommand,long>
+    public class AnimeInfoCommand : CallbackCommand<AnimeInfoCommand, long>
     {
         private readonly IAnimeService _animeService;
         private readonly IBotSender _botSender;
 
         public AnimeInfoCommand(CallbackCommandArgs commandArgs, IAnimeService animeService, IBotSender botSender,
-            ICallbackQueryDataService callbackQueryDataService) : base(commandArgs,callbackQueryDataService)
+            ICallbackQueryDataService callbackQueryDataService) : base(commandArgs, callbackQueryDataService)
         {
             _animeService = animeService;
             _botSender = botSender;
         }
 
         public override CommandTypeEnum Type => CommandTypeEnum.Command;
-
-        protected override bool CanExecuteCommand()
-        {
-            return GetCommandNameFromQuery() == Name;
-        }
 
         public override async Task ExecuteCommandAsync()
         {
@@ -34,11 +29,7 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
 
             var model = await _animeService.GetAnimeInfoModel(animeId);
 
-            await _botSender.ReplaceMessageAsync(new AnimeInfoMessage(model, new BackNavigationArgs()
-            {
-                PrevCommandData = data.PrevStringCommand,
-                CurrCommandData = GetCurrCommandFromQuery()
-            },CallbackQueryDataService),MessageId, ChatId,CancellationToken);
+            await _botSender.ReplaceMessageAsync(new AnimeInfoMessage(model, await GetBackNavigationArgs(), CallbackQueryDataService), MessageId, ChatId, CancellationToken);
             await _botSender.AnswerCallbackQueryAsync(CommandArgs.CallbackQuery.Id, cancellationToken: CancellationToken);
         }
     }

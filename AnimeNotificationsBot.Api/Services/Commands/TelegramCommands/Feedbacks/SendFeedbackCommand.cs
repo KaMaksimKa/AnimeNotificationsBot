@@ -2,20 +2,20 @@
 using AnimeNotificationsBot.Api.Services.Commands.Base;
 using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages.Anime;
+using AnimeNotificationsBot.Api.Services.Messages.Feedbacks;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.Common.Enums;
 
-namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
+namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Feedbacks
 {
-    public class FindAnimeCommand : MessageCommand
+    public class SendFeedbackCommand : MessageCommand
     {
         private readonly IUserService _userService;
         private readonly IBotSender _botSender;
-        private const string Name = "/find_anime";
-        private const string FriendlyName = "Найти аниме";
+        private const string Name = "/feedback";
+        private const string FriendlyName = "Оставить отзыв";
 
-        public FindAnimeCommand(MessageCommandArgs commandArgs, IUserService userService, IBotSender botSender) : base(commandArgs)
+        public SendFeedbackCommand(MessageCommandArgs commandArgs, IUserService userService, IBotSender botSender) : base(commandArgs)
         {
             _userService = userService;
             _botSender = botSender;
@@ -30,11 +30,9 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
 
         public override async Task ExecuteCommandAsync()
         {
-            await _userService.SetCommandStateAsync(TelegramUserId, CommandStateEnum.FindAnime);
-            await _botSender.SendMessageAsync(new FindAnimeMessage(), ChatId, CommandArgs.CancellationToken);
+            await _userService.SetCommandStateAsync(TelegramUserId, CommandStateEnum.SendFeedback);
+            await _botSender.SendMessageAsync(new SendFeedbackMessage(), ChatId, CommandArgs.CancellationToken);
         }
-
-        public static string Create() => Name;
 
         public static string CreateFriendly() => FriendlyName;
     }

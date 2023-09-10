@@ -63,13 +63,13 @@ namespace AnimeNotificationsBot.BLL.Services
                 AnimeSortTypeEnum.Rate => args.SortOrder switch
                 {
                     AnimeSortOrderEnum.Asc => query.OrderBy(x => x.Rate.HasValue ? -1 : x.Rate),
-                    AnimeSortOrderEnum.Desc => query.OrderBy(x => x.Rate),
+                    AnimeSortOrderEnum.Desc => query.OrderByDescending(x => x.Rate),
                     _ => throw new ArgumentException(nameof(AnimeSortOrderEnum))
                 },
                 AnimeSortTypeEnum.Name => args.SortOrder switch
                 {
                     AnimeSortOrderEnum.Asc => query.OrderBy(x => x.TitleRu),
-                    AnimeSortOrderEnum.Desc => query.OrderBy(x => x.TitleRu),
+                    AnimeSortOrderEnum.Desc => query.OrderByDescending(x => x.TitleRu),
                     _ => throw new ArgumentException(nameof(AnimeSortOrderEnum))
                 },
                 _ => throw new ArgumentException(nameof(AnimeSortTypeEnum))
@@ -79,8 +79,8 @@ namespace AnimeNotificationsBot.BLL.Services
 
 
             var animes = query
-                .Skip((args.NumberOfPage - 1) * args.CountPerPage)
-                .Take(args.CountPerPage)
+                .Skip((args.Pagination.NumberOfPage - 1) * args.Pagination.CountPerPage)
+                .Take(args.Pagination.CountPerPage)
                 .ToList();
 
    

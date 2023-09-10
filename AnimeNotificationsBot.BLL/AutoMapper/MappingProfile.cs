@@ -12,7 +12,8 @@ namespace AnimeNotificationsBot.BLL.AutoMapper
         {
             CreateMap<Dubbing, DubbingModel>();
 
-            CreateMap<Anime, AnimeModel>();
+            CreateMap<Anime, AnimeModel>()
+                .ForMember(d => d.IsOngoing, m => m.MapFrom(s => s.Status != null ? s.Status.Title == "Онгоинг" : false));
 
             CreateMap<AnimeNotification, AnimeNotificationModel>();
         }

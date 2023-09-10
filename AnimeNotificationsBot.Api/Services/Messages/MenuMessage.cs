@@ -1,5 +1,7 @@
 ﻿using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime;
+using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Animes;
+using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Feedbacks;
+using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Subscriptions;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -16,6 +18,11 @@ namespace AnimeNotificationsBot.Api.Services.Messages
                 {
                     new KeyboardButton(FindAnimeCommand.CreateFriendly()),
                     new KeyboardButton(HelpCommand.CreateFriendly())
+                },
+                new []
+                {
+                    new KeyboardButton(UserSubscriptionsCommand.CreateFriendly()),
+                    new KeyboardButton(SendFeedbackCommand.CreateFriendly())
                 }
             })
             {

@@ -15,6 +15,11 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Animes
                     Caption = x.TitleRu,
                     ImgHref = x.ImgHref,
                 }).ToList();
+
+            if (Images.Count == 1)
+            {
+                Images.First().Caption = null;
+            }
         }
     }
 }

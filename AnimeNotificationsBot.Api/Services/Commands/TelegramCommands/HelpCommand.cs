@@ -29,11 +29,6 @@ namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands
             await _botSender.SendMessageAsync(new HelpMessage(), CommandArgs.Message.Chat.Id, CommandArgs.CancellationToken);
         }
 
-        public static string Create()
-        {
-            return $"{Name}";
-        }
-
         public static string CreateFriendly()
         {
             return $"{FriendlyName}";

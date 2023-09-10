@@ -27,5 +27,6 @@ namespace AnimeNotificationsBot.DAL.Entities
 
         public virtual List<AnimeSubscription> AnimeSubscriptions { get; set; } = new List<AnimeSubscription>();
         public virtual List<BotMessageGroup> BotMessageGroups { get; set; } = new List<BotMessageGroup>();
+        public virtual List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
     }
 }

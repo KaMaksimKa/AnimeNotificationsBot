@@ -1,5 +1,6 @@
 ﻿using AnimeNotificationsBot.Api.Models;
 using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
+using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
 
 
@@ -22,10 +23,10 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
 
         public sealed override bool CanExecute()
         {
-            return base.CanExecute() && CommandArgs.CallbackQuery.Data != null && CanExecuteCommand();
+            return base.CanExecute() && GetCommandNameFromQuery() == Name && CanExecuteCommand();
         }
 
-        protected abstract bool CanExecuteCommand();
+        protected virtual bool CanExecuteCommand() => true;
 
         public sealed override async Task ExecuteAsync()
         {
@@ -37,6 +38,17 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
 
         public abstract Task ExecuteCommandAsync();
 
+        public static async Task<string> Create(TArgs data,ICallbackQueryDataService callbackQueryDataService, string? backCommand = null)
+        {
+            var dataId = await callbackQueryDataService.AddAsync(new CallbackDataModel<TArgs>()
+            {
+                Data = data,
+                PrevStringCommand = backCommand
+            });
+
+            return $"{Name}?{dataId}";
+        }
+
         protected async Task<CallbackDataModel<TArgs>> GetDataAsync()
         {
             if (_data == null)
@@ -44,7 +56,7 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
                 var dataId = long.Parse(CommandArgs.CallbackQuery.Data!.Split("&")[0].Split("?")[1]);
                 _data = await CallbackQueryDataService.GetAsync<CallbackDataModel<TArgs>>(dataId);
             }
-            
+
             return _data;
         }
 
@@ -58,16 +70,13 @@ namespace AnimeNotificationsBot.Api.Services.Commands.Base
             return CommandArgs.CallbackQuery.Data!.Split("&")[0].Split("?")[0];
         }
 
-   
-        public static async Task<string> Create(TArgs data,ICallbackQueryDataService callbackQueryDataService, string? backCommand = null)
+        protected async Task<BackNavigationArgs> GetBackNavigationArgs()
         {
-            var dataId = await callbackQueryDataService.AddAsync(new CallbackDataModel<TArgs>()
+            return new BackNavigationArgs()
             {
-                Data = data,
-                PrevStringCommand = backCommand
-            });
-
-            return $"{Name}?{dataId}";
+                CurrCommandData = GetCurrCommandFromQuery(),
+                PrevCommandData = (await GetDataAsync()).PrevStringCommand
+            };
         }
     }
 }
