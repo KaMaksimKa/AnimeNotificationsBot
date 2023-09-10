@@ -1,19 +1,27 @@
-﻿using AnimeNotificationsBot.Api.Services.Messages;
+﻿using AnimeNotificationsBot.Api.Services.CallbackQueryAnswers;
+using AnimeNotificationsBot.Api.Services.Messages.Base;
 using Telegram.Bot.Types;
 
 namespace AnimeNotificationsBot.Api.Services.Interfaces
 {
     public interface IBotSender
     {
-        public Task<Message> SendTextMessageAsync(TextMessage message,long chatId,
+        public Task ReplaceMessageAsync(ITelegramMessage newMessage, int oldMessageId, long chatId,
+            CancellationToken cancellationToken = default);
+        public Task SendMessageAsync(ITelegramMessage message, long chatId,
             CancellationToken cancellationToken = default);
 
-        public Task<Message> EditTextMessageAsync(TextMessage message, long chatId,
-            int messageId,CancellationToken cancellationToken = default);
+        public Task EditTextMessageAsync(TextMessage message, int messageId, long chatId,
+            CancellationToken cancellationToken = default);
 
-        public Task AnswerCallbackQueryAsync(string callbackQueryId, CancellationToken cancellationToken = default);
+        public Task EditReplyMarkupAsync(TextMessage message, int messageId, long chatId,
+            CancellationToken cancellationToken = default);
 
-        public Task DeleteReplyMarkup(long chatId,
-            int messageId, CancellationToken cancellationToken = default);
+        public Task AnswerCallbackQueryAsync(string callbackQueryId, CallbackQueryAnswer? answer = null,
+            CancellationToken cancellationToken = default);
+
+        public Task DeleteReplyMarkup(long chatId, int messageId, CancellationToken cancellationToken = default);
+
+        public Task DeleteMessageAsync(long chatId, int messageId, CancellationToken cancellationToken = default);
     }
 }

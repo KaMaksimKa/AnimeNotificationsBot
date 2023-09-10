@@ -1,8 +1,9 @@
-﻿namespace AnimeNotificationsBot.Api.Services.Commands.Base
+﻿using AnimeNotificationsBot.Api.Enums;
+
+namespace AnimeNotificationsBot.Api.Services.Commands.Base
 {
-    public interface ITelegramCommand
+    public interface ITelegramCommand: ICommand
     {
-        public bool CanExecute();
-        public Task ExecuteAsync();
+        public CommandTypeEnum Type { get; }
     }
 }
