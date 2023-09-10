@@ -8,6 +8,7 @@ using AnimeNotificationsBot.BLL.Models.Dubbing;
 using AnimeNotificationsBot.Common.Exceptions;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnimeNotificationsBot.BLL.Services
@@ -15,10 +16,12 @@ namespace AnimeNotificationsBot.BLL.Services
     public class DubbingService : IDubbingService
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public DubbingService(DataContext context)
+        public DubbingService(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         public async Task<List<DubbingModel>> GetDubbingByAnimeIdAsync(long animeId)
         {
@@ -37,11 +40,7 @@ namespace AnimeNotificationsBot.BLL.Services
             }
 
             return anime.DubbingFromFirstEpisode
-                .Select(x => new DubbingModel()
-                {
-                    Id = x.Id,
-                    Title = x.Title,
-                }).ToList();
+                .Select(x => _mapper.Map<DubbingModel>(x)).ToList();
         }
     }
 }

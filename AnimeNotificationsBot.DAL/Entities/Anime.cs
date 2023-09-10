@@ -19,6 +19,7 @@ namespace AnimeNotificationsBot.DAL.Entities
         public int? OnHold { get; set; }
         public string? Href { get; set; }
         public string? ImgIdFromAnimeGo { get; set; }
+        public string? ImgHref { get; set; }
         public string? NextEpisode { get; set; }
         public string? Duration { get; set; }
         public long? IdForComments { get; set; }

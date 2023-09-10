@@ -1,10 +1,11 @@
 ﻿using AnimeNotificationsBot.BLL.Enums;
 using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.Models.Anime;
+using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.Common.Exceptions;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnimeNotificationsBot.BLL.Services
@@ -12,15 +13,15 @@ namespace AnimeNotificationsBot.BLL.Services
     public class AnimeService : IAnimeService
     {
         private readonly DataContext _context;
-        private readonly IImageService _imageService;
+        private readonly IMapper _mapper;
 
-        public AnimeService(DataContext context, IImageService imageService)
+        public AnimeService(DataContext context,IMapper mapper)
         {
             _context = context;
-            _imageService = imageService;
+            _mapper = mapper;
         }
 
-        public async Task<AnimeWithImageModel> GetAnimeWithImageAsync(long id)
+        public async Task<AnimeModel> GetAnimeWithImageAsync(long id)
         {
             var anime = await _context.Animes.Include(x => x.Images).FirstOrDefaultAsync(x => x.Id == id);
 
@@ -33,14 +34,7 @@ namespace AnimeNotificationsBot.BLL.Services
                     PropertyValue = id
                 };
             }
-            var image = anime.Images.FirstOrDefault();
-            return new AnimeWithImageModel()
-            {
-                Id = anime.Id,
-                TitleRu = anime.TitleRu!,
-                Rate = anime.Rate,
-                Image = image == null ? null : await _imageService.GetImage(image.Path),
-            };
+            return _mapper.Map<AnimeModel>(anime);
         }
 
         public async Task<AnimeListModel> GetAnimeWithImageByArgsAsync(AnimeArgs args)
@@ -89,21 +83,10 @@ namespace AnimeNotificationsBot.BLL.Services
                 .Take(args.CountPerPage)
                 .ToList();
 
-            var animeModels = new List<AnimeWithImageModel>();
+   
 
-            foreach (var anime in animes)
-            {
-                var image = anime.Images.FirstOrDefault();
-                animeModels.Add(new AnimeWithImageModel
-                {
-                    Id = anime.Id,
-                    TitleRu = anime.TitleRu!,
-                    Rate = anime.Rate,
-                    Image = image == null ? null : await _imageService.GetImage(image.Path),
-                });
-            }
 
-            animeListModel.Animes = animeModels;
+            animeListModel.Animes = animes.Select(x => _mapper.Map<AnimeModel>(x)).ToList();
 
             return animeListModel;
         }

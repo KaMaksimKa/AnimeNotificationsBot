@@ -2,7 +2,7 @@
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.Models.BotMessageGroup;
+using AnimeNotificationsBot.BLL.Models.BotMessageGroups;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -133,18 +133,14 @@ namespace AnimeNotificationsBot.Api.Services
         private async Task<Message> SendMessageAsync(PhotoMessage message, long chatId, CancellationToken cancellationToken = default)
         {
 
-            if (message.Photo == null)
+            if ( message.ImgHref == null)
             {
                 return await SendMessageAsync((TextMessage)message, chatId, cancellationToken);
             }
             else
             {
-                var resultMessage = await _botClient.SendPhotoAsync(chatId, new InputFileStream(message.Photo.Content, message.Photo.FileName),caption: message.Text, replyMarkup: message.ReplyMarkup,
+                return await _botClient.SendPhotoAsync(chatId, new InputFileUrl(message.ImgHref),caption: message.Text, replyMarkup: message.ReplyMarkup,
                     cancellationToken: cancellationToken);
-
-                message.Photo.Content.Close();
-
-                return resultMessage;
             }
         }
 
@@ -154,20 +150,16 @@ namespace AnimeNotificationsBot.Api.Services
 
             foreach (var image in message.Images)
             {
-                media.Add(new InputMediaPhoto(new InputFileStream(image.Image.Content, image.Image.FileName))
+                if (image.ImgHref != null)
                 {
-                    Caption = image.Caption,
-                });
+                    media.Add(new InputMediaPhoto(new InputFileUrl(image.ImgHref))
+                    {
+                        Caption = image.Caption,
+                    });
+                }
             }
 
-            var resultMessages = await _botClient.SendMediaGroupAsync(chatId, media, cancellationToken: cancellationToken);
-
-            foreach (var image in message.Images)
-            {
-                image.Image.Content.Close();
-            }
-
-            return resultMessages.ToList();
+            return (await _botClient.SendMediaGroupAsync(chatId, media, cancellationToken: cancellationToken)).ToList();
         }
 
     }

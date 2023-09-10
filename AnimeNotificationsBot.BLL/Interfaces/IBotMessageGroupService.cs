@@ -1,5 +1,4 @@
-﻿using AnimeNotificationsBot.BLL.Models.BotMessage;
-using AnimeNotificationsBot.BLL.Models.BotMessageGroup;
+﻿using AnimeNotificationsBot.BLL.Models.BotMessageGroups;
 
 namespace AnimeNotificationsBot.BLL.Interfaces
 {

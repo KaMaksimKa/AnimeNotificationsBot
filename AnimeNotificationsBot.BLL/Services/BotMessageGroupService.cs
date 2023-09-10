@@ -1,6 +1,6 @@
 ﻿using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.Models.BotMessageGroup;
+using AnimeNotificationsBot.BLL.Models.BotMessageGroups;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
 using Microsoft.EntityFrameworkCore;

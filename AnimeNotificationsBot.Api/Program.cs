@@ -1,12 +1,15 @@
 using AnimeNotificationsBot.Api;
 using AnimeNotificationsBot.Api.Configs;
+using AnimeNotificationsBot.Api.Quartz.JobOptions;
 using AnimeNotificationsBot.Api.Services;
 using AnimeNotificationsBot.Api.Services.Interfaces;
+using AnimeNotificationsBot.BLL.AutoMapper;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Services;
 using AnimeNotificationsBot.DAL;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,15 +37,22 @@ builder.Services.AddScoped<ICommandFactory, CommandFactory>();
 builder.Services.AddScoped<IBotService, BotService>();
 builder.Services.AddScoped<IAnimeService, AnimeService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IImageService, ImageService>();
-builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IBotMessageGroupService, BotMessageGroupService>();
 builder.Services.AddScoped<ICallbackQueryDataService, CallbackQueryDataService>();
 builder.Services.AddScoped<IAnimeSubscriptionService, AnimeSubscriptionService>();
 builder.Services.AddScoped<IDubbingService, DubbingService>();
+builder.Services.AddScoped<IAnimeNotificationService, AnimeNotificationService>();
+
+builder.Services.AddQuartz();
+builder.Services.AddQuartzHostedService();
+
+builder.Services.Configure<QuartzConfig>(builder.Configuration.GetSection(QuartzConfig.Configuration));
+builder.Services.ConfigureOptions<NotifyAboutAnimeOptions>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

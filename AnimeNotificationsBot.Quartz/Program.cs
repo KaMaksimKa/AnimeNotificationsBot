@@ -53,7 +53,7 @@ builder.Services.AddQuartzHostedService();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-builder.Services.ConfigureOptions<AnimeNotificationOptions>();
+builder.Services.ConfigureOptions<UpdateAnimeNotificationOptions>();
 builder.Services.ConfigureOptions<UpdateAnimesOptions>();
 builder.Services.ConfigureOptions<UpdateAnimeCommentsOptions>();
 

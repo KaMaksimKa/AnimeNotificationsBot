@@ -120,6 +120,10 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_from_anime_go");
 
+                    b.Property<string>("ImgHref")
+                        .HasColumnType("text")
+                        .HasColumnName("img_href");
+
                     b.Property<string>("ImgIdFromAnimeGo")
                         .HasColumnType("text")
                         .HasColumnName("img_id_from_anime_go");

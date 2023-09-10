@@ -1,10 +1,10 @@
-﻿using AnimeNotificationsBot.BLL.Models.Anime;
+﻿using AnimeNotificationsBot.BLL.Models.Animes;
 
 namespace AnimeNotificationsBot.BLL.Interfaces
 {
     public interface IAnimeService
     {
-        Task<AnimeWithImageModel> GetAnimeWithImageAsync(long id);
+        Task<AnimeModel> GetAnimeWithImageAsync(long id);
 
         Task<AnimeListModel> GetAnimeWithImageByArgsAsync(AnimeArgs args);
 

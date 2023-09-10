@@ -4,7 +4,7 @@ using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.Api.Services.Messages;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.NewFolder.NewFolder;
+using AnimeNotificationsBot.BLL.Models.Users;
 
 namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands
 {

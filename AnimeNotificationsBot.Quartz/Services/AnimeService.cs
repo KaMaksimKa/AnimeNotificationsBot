@@ -5,6 +5,7 @@ using AnimeNotificationsBot.DAL.Entities;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using ParserAnimeGO;
+using ParserAnimeGO.Interface;
 using ParserAnimeGO.Models;
 
 namespace AnimeNotificationsBot.Quartz.Services
@@ -15,14 +16,17 @@ namespace AnimeNotificationsBot.Quartz.Services
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IImageService _imageService;
+        private readonly IAnimeGoUriFactory _animeGoUriFactory;
 
 
-        public AnimeService(ParserAnimeGo parser, DataContext context, IMapper mapper, IImageService imageService)
+        public AnimeService(ParserAnimeGo parser, DataContext context, IMapper mapper, IImageService imageService,
+            IAnimeGoUriFactory animeGoUriFactory)
         {
             _parser = parser;
             _context = context;
             _mapper = mapper;
             _imageService = imageService;
+            _animeGoUriFactory = animeGoUriFactory;
         }
 
         public async Task UpdateNotificationsAsync()
@@ -114,8 +118,8 @@ namespace AnimeNotificationsBot.Quartz.Services
                 animesFromParser = await GetAnimesByPage(numberOfPage);
                 var animes = animesFromParser.Select(x => _mapper.Map<Anime>(x)).ToList();
                 var preparedAnimes = await PrepareAnimesForAddToContext(animes);
-                var preparedAnimesWithImages = await DownloadNewAnimeImagesAsync(preparedAnimes);
-                await AddOrUpdateAnimesInContext(preparedAnimesWithImages);
+                /*var preparedAnimesWithImages = await DownloadNewAnimeImagesAsync(preparedAnimes);*/
+                await AddOrUpdateAnimesInContext(preparedAnimes);
 
                 numberOfPage++;
 
@@ -141,6 +145,9 @@ namespace AnimeNotificationsBot.Quartz.Services
 
             foreach (var anime in animes)
             {
+                anime.ImgHref = anime.ImgIdFromAnimeGo != null
+                    ? _animeGoUriFactory.GetAnimeImage(anime.ImgIdFromAnimeGo).ToString()
+                    : null;
                 anime.Type = anime.Type == null ? null : await PrepareForAddToContext(anime.Type, types);
                 anime.Status = anime.Status == null ? null : await PrepareForAddToContext(anime.Status, statuses);
                 anime.MpaaRate = anime.MpaaRate == null ? null : await PrepareForAddToContext(anime.MpaaRate, mpaaRates);
@@ -210,6 +217,10 @@ namespace AnimeNotificationsBot.Quartz.Services
                 if (_animes.FirstOrDefault(x => anime.IdFromAnimeGo == x.IdFromAnimeGo) is
                     { } animeFromDb)
                 {
+                    if (animeFromDb.IdFromAnimeGo == 2379)
+                    {
+
+                    }
                     _mapper.Map(anime, animeFromDb);
                     _context.Animes.Update(animeFromDb);
                 }

@@ -1,4 +1,4 @@
-﻿using AnimeNotificationsBot.BLL.NewFolder.NewFolder;
+﻿using AnimeNotificationsBot.BLL.Models.Users;
 using AnimeNotificationsBot.Common.Enums;
 
 namespace AnimeNotificationsBot.BLL.Interfaces

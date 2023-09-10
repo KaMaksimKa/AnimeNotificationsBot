@@ -6,7 +6,7 @@ using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.Api.Services.Messages.Anime;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.Models.Anime;
+using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.Common.Enums;
 
 namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime

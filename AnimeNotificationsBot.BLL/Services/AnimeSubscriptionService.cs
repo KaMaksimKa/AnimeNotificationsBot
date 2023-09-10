@@ -1,7 +1,7 @@
 ﻿using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Dubbing;
-using AnimeNotificationsBot.BLL.Models.Subscription;
+using AnimeNotificationsBot.BLL.Models.Subscriptions;
 using AnimeNotificationsBot.Common.Exceptions;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;

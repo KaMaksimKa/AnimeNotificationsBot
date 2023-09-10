@@ -1,6 +1,6 @@
 ﻿using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.NewFolder.NewFolder;
+using AnimeNotificationsBot.BLL.Models.Users;
 using AnimeNotificationsBot.Common.Enums;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;

@@ -4,9 +4,8 @@ using AnimeNotificationsBot.Api.Services.Commands.Base;
 using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
-using AnimeNotificationsBot.Api.Services.Messages.Subscription;
+using AnimeNotificationsBot.Api.Services.Messages.Subscriptions;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.Models.Subscription;
 
 namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Subscriptions
 {

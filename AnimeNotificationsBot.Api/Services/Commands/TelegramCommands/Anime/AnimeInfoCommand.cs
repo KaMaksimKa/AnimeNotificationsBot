@@ -2,10 +2,9 @@
 using AnimeNotificationsBot.Api.Services.Commands.Base;
 using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages.Anime;
+using AnimeNotificationsBot.Api.Services.Messages.Animes;
 using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.Common.Enums;
 
 namespace AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Anime
 {

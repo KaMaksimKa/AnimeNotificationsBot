@@ -1,4 +1,4 @@
-﻿using AnimeNotificationsBot.BLL.Models.Subscription;
+﻿using AnimeNotificationsBot.BLL.Models.Subscriptions;
 
 namespace AnimeNotificationsBot.BLL.Interfaces
 {
