@@ -45,7 +45,7 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Animes
                 });
             }
 
-            if (model.Animes.Count > MaxCountPageOnMessage)
+            if (model.CountAllAnime > MaxCountPageOnMessage)
             {
                 var lineWithNumberOfPages = new List<InlineKeyboardButton>();
 
