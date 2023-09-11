@@ -6,7 +6,7 @@ namespace AnimeNotificationsBot.Api.Services.Messages.Animes
     {
         public NotFoundAnimeMessage()
         {
-            Text = "Аниме с таким названием я не нашел, можно попробывать поискать что-то другое.";
+            Text = "Аниме с таким названием я не нашел, можно попробывать поискать что-то другое";
         }
     }
 }
