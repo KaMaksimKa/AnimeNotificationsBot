@@ -1,7 +1,7 @@
 ﻿using AnimeNotificationsBot.Api.Commands.Base;
 using AnimeNotificationsBot.Api.Commands.Base.Args;
+using AnimeNotificationsBot.Api.Messages;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages;
 
 namespace AnimeNotificationsBot.Api.Commands
 {

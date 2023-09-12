@@ -1,10 +1,7 @@
 ﻿using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.Models.Animes;
-using AnimeNotificationsBot.BLL.Models.Dubbing;
 using AnimeNotificationsBot.BLL.Models.Notifications;
 using AnimeNotificationsBot.DAL;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnimeNotificationsBot.BLL.Services

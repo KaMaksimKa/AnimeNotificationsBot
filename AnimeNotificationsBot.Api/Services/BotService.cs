@@ -1,4 +1,4 @@
-﻿using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
+﻿using AnimeNotificationsBot.Api.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using Telegram.Bot.Types;
 

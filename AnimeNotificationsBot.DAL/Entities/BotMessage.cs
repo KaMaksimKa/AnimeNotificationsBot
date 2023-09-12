@@ -1,5 +1,4 @@
-﻿using AnimeNotificationsBot.Common.Enums;
-using AnimeNotificationsBot.Common.Interfaces;
+﻿using AnimeNotificationsBot.Common.Interfaces;
 
 namespace AnimeNotificationsBot.DAL.Entities
 {

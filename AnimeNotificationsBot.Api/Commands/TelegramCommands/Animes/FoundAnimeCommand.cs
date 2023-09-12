@@ -1,9 +1,9 @@
 ﻿using AnimeNotificationsBot.Api.Commands.Base;
 using AnimeNotificationsBot.Api.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Enums;
+using AnimeNotificationsBot.Api.Messages.Animes;
+using AnimeNotificationsBot.Api.Messages.Base;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages.Animes;
-using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.Common.Enums;

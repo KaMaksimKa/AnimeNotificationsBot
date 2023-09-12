@@ -1,10 +1,9 @@
 ﻿using AnimeNotificationsBot.Api.Commands.Base;
 using AnimeNotificationsBot.Api.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Enums;
+using AnimeNotificationsBot.Api.Messages.Subscriptions;
 using AnimeNotificationsBot.Api.Models;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages.Base;
-using AnimeNotificationsBot.Api.Services.Messages.Subscriptions;
 using AnimeNotificationsBot.BLL.Interfaces;
 
 namespace AnimeNotificationsBot.Api.Commands.TelegramCommands.Subscriptions

@@ -1,5 +1,5 @@
-﻿using AnimeNotificationsBot.Api.Messages.Base;
-using AnimeNotificationsBot.Api.Services.CallbackQueryAnswers;
+﻿using AnimeNotificationsBot.Api.CallbackQueryAnswers;
+using AnimeNotificationsBot.Api.Messages.Base;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.BotMessageGroups;

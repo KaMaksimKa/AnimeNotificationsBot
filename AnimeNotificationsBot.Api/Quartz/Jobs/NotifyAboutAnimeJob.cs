@@ -1,5 +1,5 @@
-﻿using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages.Notifications;
+﻿using AnimeNotificationsBot.Api.Messages.Notifications;
+using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.BLL.Interfaces;
 using Quartz;
 

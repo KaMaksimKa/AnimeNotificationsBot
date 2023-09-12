@@ -1,5 +1,4 @@
 ﻿using AnimeNotificationsBot.BLL.Enums;
-using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.Common.Exceptions;

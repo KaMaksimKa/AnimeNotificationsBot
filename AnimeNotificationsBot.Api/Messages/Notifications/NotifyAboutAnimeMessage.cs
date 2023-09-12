@@ -1,5 +1,4 @@
 ﻿using AnimeNotificationsBot.Api.Messages.Base;
-using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.BLL.Models.Notifications;
 using Telegram.Bot.Types.ReplyMarkups;
 

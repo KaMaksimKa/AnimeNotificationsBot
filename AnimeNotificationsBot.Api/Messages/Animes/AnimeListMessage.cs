@@ -4,8 +4,8 @@ using AnimeNotificationsBot.BLL.Enums;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models;
 using AnimeNotificationsBot.BLL.Models.Animes;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AnimeNotificationsBot.Api.Messages.Animes
 {
@@ -46,10 +46,12 @@ namespace AnimeNotificationsBot.Api.Messages.Animes
                     AnimeSortOrderEnum.Desc => "убывания",
                 };
 
+
+                textMessage.ParseMode = ParseMode.Html;
                 textMessage.Text = $"""
-                Всего Аниме найдено - {model.CountAllAnime}.
-                Страница {model.Args.Pagination.NumberOfPage} из {model.CountPages}.
-                Сорнировка по {sort} в порядке {order}.
+                <i>(стр. {model.Args.Pagination.NumberOfPage} из {model.CountPages})</i>
+                Всего Аниме найдено - {model.CountAllAnime}
+                Сорнировка по {sort} в порядке {order}
                 """;
 
 

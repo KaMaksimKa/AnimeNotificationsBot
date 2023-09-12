@@ -1,8 +1,8 @@
 ﻿using AnimeNotificationsBot.Api.Commands.Base;
 using AnimeNotificationsBot.Api.Commands.Base.Args;
 using AnimeNotificationsBot.Api.Enums;
+using AnimeNotificationsBot.Api.Messages.Feedbacks;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages.Feedbacks;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.Common.Enums;
 
@@ -13,7 +13,7 @@ namespace AnimeNotificationsBot.Api.Commands.TelegramCommands.Feedbacks
         private readonly IUserService _userService;
         private readonly IBotSender _botSender;
         private const string Name = "/feedback";
-        private const string FriendlyName = "Оставить отзыв";
+        private const string FriendlyName = "📝Оставить отзыв";
 
         public SendFeedbackCommand(MessageCommandArgs commandArgs, IUserService userService, IBotSender botSender) : base(commandArgs)
         {

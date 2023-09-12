@@ -1,13 +1,10 @@
 ﻿using AnimeNotificationsBot.Api.Commands.TelegramCommands.Subscriptions;
+using AnimeNotificationsBot.Api.Messages.Animes;
 using AnimeNotificationsBot.Api.Messages.Base;
-using AnimeNotificationsBot.Api.Services.Messages.Animes;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models;
-using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.BLL.Models.Subscriptions;
-using AnimeNotificationsBot.BLL.Services;
 using Telegram.Bot.Types.ReplyMarkups;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AnimeNotificationsBot.Api.Messages.Subscriptions
 {
@@ -37,7 +34,7 @@ namespace AnimeNotificationsBot.Api.Messages.Subscriptions
 
                 }
 
-                textMessage.Text = "Список тайтлов на которые ты подписан: <i>(стр. 1 из 1)</i>";
+                textMessage.Text = $"Список тайтлов на которые ты подписан: <i>(стр. {model.Pagination.NumberOfPage} из {model.CountPages})</i>";
                 textMessage.ParseMode = Telegram.Bot.Types.Enums.ParseMode.Html;
 
                 var buttons = new List<List<InlineKeyboardButton>>();

@@ -1,6 +1,4 @@
-﻿using AnimeNotificationsBot.Common.Models;
-
-namespace AnimeNotificationsBot.Api.Models
+﻿namespace AnimeNotificationsBot.Api.Models
 {
     public class TelegramPhotoModel
     {

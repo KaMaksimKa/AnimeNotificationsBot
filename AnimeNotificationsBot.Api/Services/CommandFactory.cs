@@ -1,10 +1,10 @@
-﻿using AnimeNotificationsBot.Api.Commands.Base;
+﻿using AnimeNotificationsBot.Api.Commands;
+using AnimeNotificationsBot.Api.Commands.Base;
 using AnimeNotificationsBot.Api.Commands.Base.Args;
-using AnimeNotificationsBot.Api.Services.Commands;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Animes;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Feedbacks;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Subscriptions;
+using AnimeNotificationsBot.Api.Commands.TelegramCommands;
+using AnimeNotificationsBot.Api.Commands.TelegramCommands.Animes;
+using AnimeNotificationsBot.Api.Commands.TelegramCommands.Feedbacks;
+using AnimeNotificationsBot.Api.Commands.TelegramCommands.Subscriptions;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.BLL.Interfaces;
 
