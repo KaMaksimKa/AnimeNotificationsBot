@@ -1,6 +1,6 @@
-﻿using AnimeNotificationsBot.Api.Services.Commands;
-using AnimeNotificationsBot.Api.Services.Commands.Base;
-using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
+﻿using AnimeNotificationsBot.Api.Commands.Base;
+using AnimeNotificationsBot.Api.Commands.Base.Args;
+using AnimeNotificationsBot.Api.Services.Commands;
 using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands;
 using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Animes;
 using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Feedbacks;

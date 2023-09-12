@@ -1,6 +1,6 @@
-﻿using AnimeNotificationsBot.Api.Services.CallbackQueryAnswers;
+﻿using AnimeNotificationsBot.Api.Messages.Base;
+using AnimeNotificationsBot.Api.Services.CallbackQueryAnswers;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.Api.Services.Messages.Base;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.BotMessageGroups;
 using Telegram.Bot;
