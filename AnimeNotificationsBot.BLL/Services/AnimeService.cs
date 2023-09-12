@@ -1,5 +1,4 @@
 ﻿using AnimeNotificationsBot.BLL.Enums;
-using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.Common.Exceptions;
@@ -44,7 +43,6 @@ namespace AnimeNotificationsBot.BLL.Services
                 Args = args
             };
 
-
             var query = _context.Animes
                 .Include(x => x.Images)
                 .Where(x => x.TitleRu != null);
@@ -56,14 +54,19 @@ namespace AnimeNotificationsBot.BLL.Services
                                              x.TitleEn.ToLower().Contains(args.SearchQuery.ToLower())));
             }
 
+            if (args.OnlyOngoing)
+            {
+                query = query.Where(x => x.Status != null && x.Status.Title == "Онгоинг");
+            }
+
             animeListModel.CountAllAnime = await query.CountAsync();
 
             query = args.SortType switch
             {
                 AnimeSortTypeEnum.Rate => args.SortOrder switch
                 {
-                    AnimeSortOrderEnum.Asc => query.OrderBy(x => x.Rate.HasValue ? -1 : x.Rate),
-                    AnimeSortOrderEnum.Desc => query.OrderByDescending(x => x.Rate),
+                    AnimeSortOrderEnum.Asc => query.OrderBy(x => x.Rate),
+                    AnimeSortOrderEnum.Desc => query.OrderByDescending(x => x.Rate ?? - 1  ),
                     _ => throw new ArgumentException(nameof(AnimeSortOrderEnum))
                 },
                 AnimeSortTypeEnum.Name => args.SortOrder switch

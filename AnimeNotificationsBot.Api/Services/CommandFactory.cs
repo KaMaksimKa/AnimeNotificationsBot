@@ -1,10 +1,10 @@
-﻿using AnimeNotificationsBot.Api.Services.Commands;
-using AnimeNotificationsBot.Api.Services.Commands.Base;
-using AnimeNotificationsBot.Api.Services.Commands.Base.Args;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Animes;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Feedbacks;
-using AnimeNotificationsBot.Api.Services.Commands.TelegramCommands.Subscriptions;
+﻿using AnimeNotificationsBot.Api.Commands;
+using AnimeNotificationsBot.Api.Commands.Base;
+using AnimeNotificationsBot.Api.Commands.Base.Args;
+using AnimeNotificationsBot.Api.Commands.TelegramCommands;
+using AnimeNotificationsBot.Api.Commands.TelegramCommands.Animes;
+using AnimeNotificationsBot.Api.Commands.TelegramCommands.Feedbacks;
+using AnimeNotificationsBot.Api.Commands.TelegramCommands.Subscriptions;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.BLL.Interfaces;
 
@@ -57,7 +57,8 @@ namespace AnimeNotificationsBot.Api.Services
                 new MenuCommand(commandArgs,_botSender),
                 new SendFeedbackCommand(commandArgs,_userService,_botSender),
                 new SentFeedbackCommand(commandArgs,_feedbackService,_userService,_botSender),
-                new UserSubscriptionsCommand(commandArgs,_subscriptionService,_botSender,_callbackQueryDataService)
+                new UserSubscriptionsCommand(commandArgs,_subscriptionService,_botSender,_callbackQueryDataService),
+                new OngoingAnimeCommand(commandArgs,_animeService,_botSender,_callbackQueryDataService)
             });
 
             return new MainCommand(commandArgs, command, _botSender);

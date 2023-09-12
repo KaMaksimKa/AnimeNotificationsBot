@@ -4,13 +4,11 @@ using AnimeNotificationsBot.BLL.Models;
 using AnimeNotificationsBot.BLL.Models.Animes;
 using AnimeNotificationsBot.BLL.Models.Dubbing;
 using AnimeNotificationsBot.BLL.Models.Subscriptions;
-using AnimeNotificationsBot.Common.Exceptions;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace AnimeNotificationsBot.BLL.Services
 {
