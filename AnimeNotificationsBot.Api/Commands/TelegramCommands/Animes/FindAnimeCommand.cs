@@ -13,7 +13,7 @@ namespace AnimeNotificationsBot.Api.Commands.TelegramCommands.Animes
         private readonly IUserService _userService;
         private readonly IBotSender _botSender;
         private const string Name = "/find_anime";
-        private const string FriendlyName = "Найти аниме";
+        private const string FriendlyName = "🔍Найти аниме";
 
         public FindAnimeCommand(MessageCommandArgs commandArgs, IUserService userService, IBotSender botSender) : base(commandArgs)
         {

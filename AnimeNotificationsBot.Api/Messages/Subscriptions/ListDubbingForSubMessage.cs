@@ -42,7 +42,7 @@ namespace AnimeNotificationsBot.Api.Messages.Subscriptions
             {
                 buttons.Add(new List<InlineKeyboardButton>()
                 {
-                    InlineKeyboardButton.WithCallbackData("Назад",backNavigationArgs.PrevCommandData)
+                    InlineKeyboardButton.WithCallbackData("⬅️Назад",backNavigationArgs.PrevCommandData)
                 });
             }
 

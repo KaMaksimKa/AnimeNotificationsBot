@@ -61,11 +61,9 @@ namespace AnimeNotificationsBot.Api.Messages.Subscriptions
                     var finish = Math.Min(model.CountPages + 1, start + MaxCountPageOnMessage);
                     for (int numberOfPage = start; numberOfPage < finish; numberOfPage++)
                     {
-                        var pagination = new PaginationModel()
-                        {
-                            CountPerPage = model.Pagination.CountPerPage,
-                            NumberOfPage = numberOfPage,
-                        };
+                        var pagination = model.Pagination.Copy();
+                        pagination.NumberOfPage = numberOfPage;
+
                         var nameButtonPage = numberOfPage == model.Pagination.NumberOfPage
                             ? $"✅{numberOfPage}"
                             : numberOfPage.ToString();

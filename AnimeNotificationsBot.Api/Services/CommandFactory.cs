@@ -57,7 +57,8 @@ namespace AnimeNotificationsBot.Api.Services
                 new MenuCommand(commandArgs,_botSender),
                 new SendFeedbackCommand(commandArgs,_userService,_botSender),
                 new SentFeedbackCommand(commandArgs,_feedbackService,_userService,_botSender),
-                new UserSubscriptionsCommand(commandArgs,_subscriptionService,_botSender,_callbackQueryDataService)
+                new UserSubscriptionsCommand(commandArgs,_subscriptionService,_botSender,_callbackQueryDataService),
+                new OngoingAnimeCommand(commandArgs,_animeService,_botSender,_callbackQueryDataService)
             });
 
             return new MainCommand(commandArgs, command, _botSender);

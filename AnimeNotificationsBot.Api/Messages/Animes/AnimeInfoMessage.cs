@@ -35,14 +35,14 @@ namespace AnimeNotificationsBot.Api.Messages.Animes
             {
                 buttons.Add(new List<InlineKeyboardButton>
                 {
-                    InlineKeyboardButton.WithCallbackData("Уведомления",SubscriptionDubbingByAnimeCommand.Create(anime.Id,callbackQueryDataService,backNavigationArgs.CurrCommandData).Result)
+                    InlineKeyboardButton.WithCallbackData("🔔Уведомления",SubscriptionDubbingByAnimeCommand.Create(anime.Id,callbackQueryDataService,backNavigationArgs.CurrCommandData).Result)
                 });
             }
 
             if (backNavigationArgs.PrevCommandData != null)
                 buttons.Add(new List<InlineKeyboardButton>
             {
-                InlineKeyboardButton.WithCallbackData("Назад", backNavigationArgs.PrevCommandData)
+                InlineKeyboardButton.WithCallbackData("⬅️Назад", backNavigationArgs.PrevCommandData)
             });
 
             ReplyMarkup = new InlineKeyboardMarkup(buttons);

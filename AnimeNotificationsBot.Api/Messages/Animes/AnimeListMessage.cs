@@ -46,12 +46,13 @@ namespace AnimeNotificationsBot.Api.Messages.Animes
                     AnimeSortOrderEnum.Desc => "убывания",
                 };
 
+                var ongoing = model.Args.OnlyOngoing ? "🚀<b>Онгоинги</b>.\n\n" : "";
+                var search = !string.IsNullOrEmpty(model.Args.SearchQuery) ? $"🔍Поисковой запрос - <b>{model.Args.SearchQuery}</b>\n\n" : "";
 
                 textMessage.ParseMode = ParseMode.Html;
                 textMessage.Text = $"""
-                <i>(стр. {model.Args.Pagination.NumberOfPage} из {model.CountPages})</i>
-                Всего Аниме найдено - {model.CountAllAnime}
-                Сорнировка по {sort} в порядке {order}
+                {ongoing}{search}Всего Аниме найдено - {model.CountAllAnime} <i>(стр. {model.Args.Pagination.NumberOfPage} из {model.CountPages})</i> 
+                Сортировка по {sort} в порядке {order}
                 """;
 
 
@@ -77,17 +78,8 @@ namespace AnimeNotificationsBot.Api.Messages.Animes
                     var finish = Math.Min(model.CountPages + 1, start + MaxCountPageOnMessage);
                     for (int numberOfPage = start; numberOfPage < finish; numberOfPage++)
                     {
-                        var animeArgsForPage = new AnimeArgs()
-                        {
-                            SortOrder = model.Args.SortOrder,
-                            SortType = model.Args.SortType,
-                            Pagination = new PaginationModel()
-                            {
-                                CountPerPage = model.Args.Pagination.CountPerPage,
-                                NumberOfPage = numberOfPage
-                            },
-                            SearchQuery = model.Args.SearchQuery,
-                        };
+                        var animeArgsForPage = model.Args.Copy();
+                        animeArgsForPage.Pagination.NumberOfPage = numberOfPage;
 
                         var nameButtonPage = numberOfPage == model.Args.Pagination.NumberOfPage ? $"✅{numberOfPage}" : numberOfPage.ToString();
 

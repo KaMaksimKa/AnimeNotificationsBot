@@ -17,10 +17,11 @@ namespace AnimeNotificationsBot.Api.Messages
                 new []
                 {
                     new KeyboardButton(FindAnimeCommand.CreateFriendly()),
-                    new KeyboardButton(UserSubscriptionsCommand.CreateFriendly()),
+                    new KeyboardButton(OngoingAnimeCommand.CreateFriendly()),
                 },
                 new []
                 {
+                    new KeyboardButton(UserSubscriptionsCommand.CreateFriendly()),
                     new KeyboardButton(SendFeedbackCommand.CreateFriendly())
                 }
             })
