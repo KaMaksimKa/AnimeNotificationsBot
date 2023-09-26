@@ -9,7 +9,9 @@ namespace AnimeNotificationsBot.Quartz.AutoMapper
         public MappingProfile()
         {
             CreateMap<Anime, Anime>()
-                .ForMember(d => d.Id, m => m.Ignore());
+                .ForMember(d => d.Id, m => m.Ignore())
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+                
 
             CreateMap<AnimeFromParser, Anime>()
                 .ForMember(d => d.Type, m => m.MapFrom(s => s.Type == null ? null : new AnimeType() { Title = s.Type }))

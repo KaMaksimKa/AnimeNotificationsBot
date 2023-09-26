@@ -260,7 +260,6 @@ namespace AnimeNotificationsBot.Quartz.Services
                     { } animeFromDb)
                 {
                     _mapper.Map(anime, animeFromDb);
-                    _context.Animes.Update(animeFromDb);
                 }
                 else
                     await _context.Animes.AddAsync(anime);
