@@ -26,6 +26,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./AnimeNotificationBot.Api/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/anime_notification_bot_api_:latest
