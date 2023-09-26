@@ -1,6 +1,6 @@
 name: anime_notification_bot
 
-on: # specify the build to trigger the automated ci/cd
+on: # specify the build to trigger the automated ci/cd test
     push:
         branches:
             - "master"
