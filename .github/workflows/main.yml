@@ -30,4 +30,4 @@ jobs:
                   context: ./AnimeNotificationsBot.Api
                   file: ./Dockerfile
                   push: true
-                  tags: $/anime_bot_notification_api:latest
+                  tags: anime_bot_notification_api:latest
