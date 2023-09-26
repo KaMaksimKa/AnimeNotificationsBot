@@ -28,4 +28,4 @@ jobs:
           context: .
           file: ./AnimeNotificationsBot.Api/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/test:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/anime-notifications-bot-api:latest
