@@ -89,7 +89,10 @@ namespace AnimeNotificationsBot.BLL.Services
 
             var subs = await _context.Animes
                 .Where(x => x.Id == animeId)
-                .SelectMany(x => x.DubbingFromFirstEpisode)
+                .SelectMany(x => x.AnimeNotifications)
+                .Where(x => x.CreatedDate > DateTimeOffset.UtcNow.AddDays(-14))
+                .Select(x => x.Dubbing)
+                .Distinct()
                 .Select(x => new SubscriptionDubbingModel()
                 {
                     AnimeId = animeId,

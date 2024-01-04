@@ -1,17 +1,5 @@
-version: '3'
+version: '3.9'
 services:
-  anime_notification_bot_api:
-    container_name: anime_notification_bot_api
-    build:
-      context: /
-      dockerfile: docker/api/Dockerfile
-    ports:
-      - "8000:80"
-    depends_on:
-      - db
-    environment:
-      ConnectionStrings__PostgreSql: "Server=db;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
- 
   anime_notification_bot_quartz:
     container_name: anime_notification_bot_quartz
     build:
@@ -23,6 +11,24 @@ services:
       - db
     environment:
       ConnectionStrings__PostgreSql: "Server=db;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
+    restart: always
+    networks:
+      - test
+
+  anime_notification_bot_api:
+    container_name: anime_notification_bot_api
+    build:
+      context: /
+      dockerfile: docker/api/Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    environment:
+      ConnectionStrings__PostgreSql: "Server=db;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
+    restart: always
+    networks:
+      - test
  
   db:
     container_name: db
@@ -32,9 +38,38 @@ services:
       - POSTGRES_PASSWORD=P@ssw0rd
       - POSTGRES_DB=anime_notification_bot
     ports:
-      - "5432:5432"
+      - "6543:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - test
+    restart: always
 
+  webserver:
+    container_name: web
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    volumes:
+      - ./nginx/conf/default.conf:/etc/nginx/conf.d/default.conf/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - test
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - test
+
+networks:
+  test:
+    driver: bridge
 volumes:
   pgdata: {}

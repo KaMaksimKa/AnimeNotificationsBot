@@ -23,10 +23,4 @@
     <ProjectReference Include="..\AnimeNotificationsBot.BLL\AnimeNotificationsBot.BLL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="ParserAnimeGO">
-      <HintPath>..\..\..\OldRepos\repos\ParserAnimeGO\ParserAnimeGO\bin\Debug\net7.0\ParserAnimeGO.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
