@@ -1,23 +1,23 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
-
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["AnimeNotificationsBot.Api/AnimeNotificationsBot.Api.csproj", "AnimeNotificationsBot.Api/"]
 COPY ["AnimeNotificationsBot.BLL/AnimeNotificationsBot.BLL.csproj", "AnimeNotificationsBot.BLL/"]
 COPY ["AnimeNotificationsBot.Common/AnimeNotificationsBot.Common.csproj", "AnimeNotificationsBot.Common/"]
 COPY ["AnimeNotificationsBot.DAL/AnimeNotificationsBot.DAL.csproj", "AnimeNotificationsBot.DAL/"]
-RUN dotnet restore "AnimeNotificationsBot.Api/AnimeNotificationsBot.Api.csproj"
+RUN dotnet restore "./AnimeNotificationsBot.Api/./AnimeNotificationsBot.Api.csproj"
 COPY . .
 WORKDIR "/src/AnimeNotificationsBot.Api"
-RUN dotnet build "AnimeNotificationsBot.Api.csproj" -c Release -o /app/build
+RUN dotnet build "./AnimeNotificationsBot.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "AnimeNotificationsBot.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./AnimeNotificationsBot.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

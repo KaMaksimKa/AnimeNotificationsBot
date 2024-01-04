@@ -3,31 +3,30 @@ services:
   anime_notification_bot_api:
     container_name: anime_notification_bot_api
     build:
-      context: ./AnimeNotificationsBot.Api
-      dockerfile: Dockerfile
+      context: /
+      dockerfile: docker/api/Dockerfile
     ports:
-      - "8080:80"
-      - "8081:443"
+      - "8000:80"
     depends_on:
       - db
     environment:
-      ConnectionStrings__PostgreSql: "Server=localhost;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
+      ConnectionStrings__PostgreSql: "Server=db;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
  
   anime_notification_bot_quartz:
     container_name: anime_notification_bot_quartz
     build:
-      context: ./AnimeNotificationsBot.Quartz
-      dockerfile: Dockerfile
+      context: /
+      dockerfile: docker/quartz/Dockerfile
     ports:
-      - "8080:5050"
+      - "9000:80"
     depends_on:
       - db
     environment:
-      ConnectionStrings__PostgreSql: "Server=localhost;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
+      ConnectionStrings__PostgreSql: "Server=db;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
  
   db:
     container_name: db
-    image: postgres:14
+    image: postgres:16
     environment:
       - POSTGRES_USER=sa
       - POSTGRES_PASSWORD=P@ssw0rd
