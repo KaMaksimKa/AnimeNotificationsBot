@@ -11,7 +11,7 @@ services:
     depends_on:
       - db
     environment:
-      ConnectionStrings__PostgreSql: "Server=localhost;Port=5432;Database=anime_notification_bot;User Id=kamaksimka;Password=ylikeMNjq7S8+"
+      ConnectionStrings__PostgreSql: "Server=localhost;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
  
   anime_notification_bot_quartz:
     container_name: anime_notification_bot_quartz
@@ -23,14 +23,14 @@ services:
     depends_on:
       - db
     environment:
-      ConnectionStrings__PostgreSql: "Server=localhost;Port=5432;Database=anime_notification_bot;User Id=kamaksimka;Password=ylikeMNjq7S8+"
+      ConnectionStrings__PostgreSql: "Server=localhost;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
  
   db:
     container_name: db
     image: postgres:14
     environment:
-      - POSTGRES_USER=kamaksimka
-      - POSTGRES_PASSWORD=ylikeMNjq7S8+
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=P@ssw0rd
       - POSTGRES_DB=anime_notification_bot
     ports:
       - "5432:5432"
