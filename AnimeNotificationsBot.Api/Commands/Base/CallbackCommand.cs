@@ -2,17 +2,18 @@
 using AnimeNotificationsBot.Api.Messages.Base;
 using AnimeNotificationsBot.Api.Models;
 using AnimeNotificationsBot.BLL.Interfaces;
+using AnimeNotificationsBot.BLL.Services;
 
 
 namespace AnimeNotificationsBot.Api.Commands.Base
 {
-    public abstract class CallbackCommand<TCommand, TArgs> : TelegramCommand, ICallbackCommand
+    public abstract class CallbackCommand<TCommand, TArgs> : CallbackCommand, ICallbackCommand
     {
         protected CallbackCommandArgs CommandArgs;
         protected readonly ICallbackQueryDataService CallbackQueryDataService;
         protected static readonly string Name = typeof(TCommand).Name;
 
-        private CallbackDataModel<TArgs>? _data;
+        private CallbackData<TArgs>? _data;
 
 
         protected CallbackCommand(CallbackCommandArgs commandArgs, ICallbackQueryDataService callbackQueryDataService) : base(commandArgs)
@@ -40,43 +41,46 @@ namespace AnimeNotificationsBot.Api.Commands.Base
 
         public static async Task<string> Create(TArgs data, ICallbackQueryDataService callbackQueryDataService, string? backCommand = null)
         {
-            var dataId = await callbackQueryDataService.AddAsync(new CallbackDataModel<TArgs>()
+            var dataId = await callbackQueryDataService.AddAsync(new CallbackData<TArgs>()
             {
                 Data = data,
-                PrevStringCommand = backCommand
+                StringBackCommand = backCommand
             });
 
             return $"{Name}?{dataId}";
         }
 
-        protected async Task<CallbackDataModel<TArgs>> GetDataAsync()
+        protected async Task<CallbackData<TArgs>> GetDataAsync()
         {
             if (_data == null)
             {
                 var dataId = long.Parse(CommandArgs.CallbackQuery.Data!.Split("&")[0].Split("?")[1]);
-                _data = await CallbackQueryDataService.GetAsync<CallbackDataModel<TArgs>>(dataId);
+                _data = await CallbackQueryDataService.GetAsync<CallbackData<TArgs>>(dataId);
             }
 
             return _data;
         }
 
-        protected string GetCurrCommandFromQuery()
-        {
-            return CommandArgs.CallbackQuery.Data!.Split("&")[0];
-        }
-
         protected string GetCommandNameFromQuery()
         {
-            return CommandArgs.CallbackQuery.Data!.Split("&")[0].Split("?")[0];
+            return CommandArgs.CallbackQuery.Data!.Split("?")[0];
         }
 
         protected async Task<BackNavigationArgs> GetBackNavigationArgs()
         {
             return new BackNavigationArgs()
             {
-                CurrCommandData = GetCurrCommandFromQuery(),
-                PrevCommandData = (await GetDataAsync()).PrevStringCommand
+                CurrCommandData = CommandArgs.CallbackQuery.Data!,
+                PrevCommandData = (await GetDataAsync()).StringBackCommand
             };
+        }
+    }
+
+    public abstract class CallbackCommand: TelegramCommand {
+
+        protected CallbackCommand(CallbackCommandArgs commandArgs) : base(commandArgs)
+        {
+
         }
     }
 }

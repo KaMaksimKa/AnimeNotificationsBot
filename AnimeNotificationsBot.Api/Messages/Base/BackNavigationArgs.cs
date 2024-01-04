@@ -3,6 +3,6 @@
     public class BackNavigationArgs
     {
         public string? PrevCommandData { get; set; }
-        public string? CurrCommandData { get; set; }
+        public required string CurrCommandData { get; set; }
     }
 }
