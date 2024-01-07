@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>4acfee07-cff5-49e2-9026-0b5474a0f22b</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<DockerfileTag>anime-notification-bot-quartz</DockerfileTag>
   </PropertyGroup>
 
   <ItemGroup>

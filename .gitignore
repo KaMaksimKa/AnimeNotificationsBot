@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Deploy/certbot/conf/accounts/acme-v02.api.letsencrypt.org/directory/7eca2c3de6e71bf94bd9281475a6df2d

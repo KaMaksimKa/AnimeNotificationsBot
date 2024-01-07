@@ -1,0 +1,37 @@
+sudo apt clean all && sudo apt update && sudo apt dist-upgrade
+
+# Создание пользователя
+adduser kamaksimka
+gpasswd -a kamaksimka sudo
+
+# Вход под пользователем
+su - kamaksimka
+
+# Настройка входа по ssh key
+mkdir .ssh
+chmod 700 .ssh
+nano .ssh/authorized_keys
+
+home-mashine: ssh-keygen
+
+chmod 600 .ssh/authorized_keys
+exit
+
+# если надо поменять настройки ssh
+nano /etc/ssh/sshd_config
+service ssh restart
+
+# Убрать запрос пароля у пользователя
+nano /etc/sudoers
+kamaksimka ALL=(ALL) NOPASSWD: ALL # в конец файла
+
+# установка Docker
+sudo apt update
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+sudo apt update
+apt-cache policy docker-ce
+sudo apt install docker-ce
+sudo systemctl status docker
+sudo usermod -aG docker kamaksimka
