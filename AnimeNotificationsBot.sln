@@ -17,8 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimeNotificationsBot.Commo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{30CAFDCE-C6B4-4C12-B0E0-B6D6B9550248}"
 	ProjectSection(SolutionItems) = preProject
-		nginx\conf\default.conf = nginx\conf\default.conf
-		docker-compose.yml = docker-compose.yml
+		Deploy\nginx\conf\default.conf = Deploy\nginx\conf\default.conf
+		Deploy\docker-compose.yml = Deploy\docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimeNotificationsBot.Test", "AnimeNotificationsBot.Test\AnimeNotificationsBot.Test.csproj", "{794699AC-943C-45BB-859E-676D84E44632}"

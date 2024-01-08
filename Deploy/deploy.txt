@@ -35,3 +35,13 @@ apt-cache policy docker-ce
 sudo apt install docker-ce
 sudo systemctl status docker
 sudo usermod -aG docker kamaksimka
+
+#установка Docker compose
+sudo apt-get update
+sudo apt-get install docker-compose-plugin
+
+#запуск docker compose вместе с certbot
+docker compose up -d #or
+docker compose restart
+
+docker compose run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d kamaksimka.ru
