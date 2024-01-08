@@ -23,6 +23,8 @@ namespace AnimeNotificationsBot.Api.Services
         public async Task ReplaceMessageAsync(ITelegramMessage newMessage, int oldMessageId, long chatId,
             CancellationToken cancellationToken = default)
         {
+            await SendMessageAsync(newMessage, chatId, cancellationToken);
+
             var botMessageGroupModel = await _botMessageGroupService.GetByMessageIdAsync(oldMessageId);
 
             if (botMessageGroupModel != null)
@@ -36,9 +38,6 @@ namespace AnimeNotificationsBot.Api.Services
 
                 await Task.WhenAll(deletedTasks);
             }
-
-            await SendMessageAsync(newMessage, chatId, cancellationToken);
-
         }
 
         public async Task SendMessageAsync(ITelegramMessage message, long chatId, CancellationToken cancellationToken = default)
