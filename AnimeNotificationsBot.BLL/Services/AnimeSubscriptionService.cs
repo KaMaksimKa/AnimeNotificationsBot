@@ -1,4 +1,5 @@
-﻿using AnimeNotificationsBot.BLL.Helpers;
+﻿using AnimeNotificationsBot.BLL.Configs;
+using AnimeNotificationsBot.BLL.Helpers;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Models;
 using AnimeNotificationsBot.BLL.Models.Animes;
@@ -9,6 +10,7 @@ using AnimeNotificationsBot.DAL.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace AnimeNotificationsBot.BLL.Services
 {
@@ -16,11 +18,13 @@ namespace AnimeNotificationsBot.BLL.Services
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly AnimeConfig _animeConfig;
 
-        public AnimeSubscriptionService(DataContext context, IMapper mapper)
+        public AnimeSubscriptionService(DataContext context, IMapper mapper,IOptions<AnimeConfig> animeOptions)
         {
             _context = context;
             _mapper = mapper;
+            _animeConfig = animeOptions.Value;
         }
 
         public async Task<SubscribedAnimeModel> SubscribeAsync(SubscribeAnimeModel model, long telegramUserId)
@@ -28,17 +32,18 @@ namespace AnimeNotificationsBot.BLL.Services
 
             var user = await _context.Users.GetUserByTelegramId(telegramUserId);
 
-            var subs = await _context.Animes
-                .Where(x => (!model.AnimeId.HasValue || model.AnimeId == x.Id))
-                .SelectMany(x => x.DubbingFromFirstEpisode.Select(y => new
+            var subs = await _context.AnimeNotifications
+                .Where(x => (!model.AnimeId.HasValue || x.AnimeId == model.AnimeId)  
+                    && (!model.DubbingId.HasValue || x.DubbingId == model.DubbingId)
+                    && x.CreatedDate > DateTimeOffset.UtcNow.AddDays(-_animeConfig.NotificationRelevanceDays))
+                .Select(x => new
                 {
-                    AnimeId = x.Id,
-                    AnimeTitle = x.TitleRu,
-                    DubbingId = y.Id,
-                    DubbingTite = y.Title
-
-                }))
-                .Where(x => !model.DubbingId.HasValue || model.DubbingId == x.DubbingId)
+                    AnimeId = x.AnimeId,
+                    AnimeTitle = x.Anime.TitleRu,
+                    DubbingId = x.DubbingId,
+                    DubbingTite = x.Dubbing.Title,
+                })
+                .Distinct() 
                 .ToListAsync();
 
             await _context.AnimeSubscriptions.AddRangeAsync(subs.Select(x => new AnimeSubscription()
@@ -90,7 +95,7 @@ namespace AnimeNotificationsBot.BLL.Services
             var subs = await _context.Animes
                 .Where(x => x.Id == animeId)
                 .SelectMany(x => x.AnimeNotifications)
-                .Where(x => x.CreatedDate > DateTimeOffset.UtcNow.AddDays(-14))
+                .Where(x => x.CreatedDate > DateTimeOffset.UtcNow.AddDays(-_animeConfig.NotificationRelevanceDays))
                 .Select(x => x.Dubbing)
                 .Distinct()
                 .Select(x => new SubscriptionDubbingModel()
@@ -114,7 +119,7 @@ namespace AnimeNotificationsBot.BLL.Services
             var query = _context.AnimeSubscriptions
                 .Where(x => !x.IsRemoved
                             && x.UserId == user.Id
-                            && x.Anime.AnimeNotifications.Any(y => y.CreatedDate > DateTimeOffset.UtcNow.AddDays(-14)))
+                            && x.Anime.AnimeNotifications.Any(y => y.CreatedDate > DateTimeOffset.UtcNow.AddDays(-_animeConfig.NotificationRelevanceDays)))
                 .Select(x => x.Anime)
                 .Distinct();
                 

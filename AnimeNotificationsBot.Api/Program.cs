@@ -4,6 +4,7 @@ using AnimeNotificationsBot.Api.Quartz.JobOptions;
 using AnimeNotificationsBot.Api.Services;
 using AnimeNotificationsBot.Api.Services.Interfaces;
 using AnimeNotificationsBot.BLL.AutoMapper;
+using AnimeNotificationsBot.BLL.Configs;
 using AnimeNotificationsBot.BLL.Interfaces;
 using AnimeNotificationsBot.BLL.Services;
 using AnimeNotificationsBot.DAL;
@@ -21,8 +22,11 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 var botConfigurationSection = builder.Configuration.GetSection(BotConfiguration.Configuration);
 builder.Services.Configure<BotConfiguration>(botConfigurationSection);
-var botConfiguration = botConfigurationSection.Get<BotConfiguration>()!;
+builder.Services.Configure<QuartzConfig>(builder.Configuration.GetSection(QuartzConfig.Configuration));
+builder.Services.Configure<AnimeConfig>(builder.Configuration.GetSection(AnimeConfig.Configuration));
 
+
+var botConfiguration = botConfigurationSection.Get<BotConfiguration>()!;
 builder.Services.AddHttpClient("telegram_bot_client")
     .AddTypedClient<ITelegramBotClient>(httpClient =>
     {
@@ -47,8 +51,6 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
 builder.Services.AddQuartz();
 builder.Services.AddQuartzHostedService();
-
-builder.Services.Configure<QuartzConfig>(builder.Configuration.GetSection(QuartzConfig.Configuration));
 builder.Services.ConfigureOptions<NotifyAboutAnimeOptions>();
 
 builder.Services.AddEndpointsApiExplorer();
