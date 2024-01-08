@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>35a62622-f3df-48a9-abd2-ff416420fd5c</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<DockerfileTag>anime-notification-bot-api</DockerfileTag>
   </PropertyGroup>
 
   <ItemGroup>

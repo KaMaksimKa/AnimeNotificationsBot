@@ -67,4 +67,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 
+app.MapGet("/ping", () => Results.Ok("Ok"));
+
 app.Run();

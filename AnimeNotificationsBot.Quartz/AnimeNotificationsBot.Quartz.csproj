@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>4acfee07-cff5-49e2-9026-0b5474a0f22b</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<DockerfileTag>anime-notification-bot-quartz</DockerfileTag>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,18 +15,13 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="ParserAnimeGO" Version="1.0.0" />
     <PackageReference Include="Quartz" Version="3.7.0" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.7.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AnimeNotificationsBot.BLL\AnimeNotificationsBot.BLL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="ParserAnimeGO">
-      <HintPath>..\..\..\OldRepos\repos\ParserAnimeGO\ParserAnimeGO\bin\Debug\net7.0\ParserAnimeGO.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

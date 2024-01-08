@@ -84,6 +84,6 @@ app.MapPost($"{botConfiguration.Route}/{botConfiguration.BotToken}", async (Newt
     return Results.Ok();
 });
 
-app.MapGet("/ping", () => Results.Ok());
+app.MapGet("/ping", () => Results.Ok("Ok"));
 
 app.Run();
