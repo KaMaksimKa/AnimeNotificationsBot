@@ -9,8 +9,9 @@ services:
       - db
     environment:
       ConnectionStrings__PostgreSql: "Server=db;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
-      BotConfiguration__BotToken: "6639623110:AAFRnUFQYQ5zJS7L7TvMWUqy1Jnt1p0poxo"
+      BotConfiguration__BotToken: ""
       BotConfiguration__HostAddress: "https://kamaksimka.ru"
+      QuartzConfig__NotifyAboutAnimeJobCronSchedule: "30 * * ? * * *"
     restart: always
     networks:
       - net
@@ -24,6 +25,9 @@ services:
       - db
     environment:
       ConnectionStrings__PostgreSql: "Server=db;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
+      QuartzConfig__AnimeNotificationCronSchedule: "0 * * ? * * *"
+      QuartzConfig__UpdateAnimesCronSchedule: "0 0 12 ? * * *"
+      QuartzConfig__UpdateAnimeCommentsCronSchedule: "0 0 0 ? * 1/7 *"
     restart: always
     networks:
       - net

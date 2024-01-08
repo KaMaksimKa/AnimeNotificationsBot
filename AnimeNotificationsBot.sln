@@ -18,6 +18,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{30CAFDCE-C6B4-4C12-B0E0-B6D6B9550248}"
 	ProjectSection(SolutionItems) = preProject
 		Deploy\nginx\conf\default.conf = Deploy\nginx\conf\default.conf
+		Deploy\deploy.txt = Deploy\deploy.txt
 		Deploy\docker-compose.yml = Deploy\docker-compose.yml
 	EndProjectSection
 EndProject
