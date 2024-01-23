@@ -37,7 +37,7 @@ builder.Services.AddHttpClient("telegram_bot_client")
 builder.Services.AddHostedService<ConfigureWebhook>();
 
 builder.Services.AddScoped<IBotSender, BotSender>();
-builder.Services.AddScoped<ICommandFactory, CommandFactory>();
+builder.Services.AddScoped<ICommandFactory, ReflectionCommandFactory>();
 builder.Services.AddScoped<IBotService, BotService>();
 builder.Services.AddScoped<IAnimeService, AnimeService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -79,6 +79,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
 
 app.MapPost($"{botConfiguration.Route}/{botConfiguration.BotToken}", async (NewtonsoftJsonUpdate update, IBotService botService,
     CancellationToken cancellationToken) => {

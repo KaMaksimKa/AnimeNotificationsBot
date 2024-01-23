@@ -14,10 +14,11 @@ namespace AnimeNotificationsBot.DAL.Entities
 
         public long? ParentCommentId { get; set; }
         public virtual AnimeComment? ParentComment { get; set; }
-        public virtual List<AnimeComment> Children { get; set; } = new List<AnimeComment>();
 
         public required long AnimeId { get; set; }
         public virtual Anime Anime { get; set; } = null!;
+
+        public virtual List<AnimeComment> Children { get; set; } = new List<AnimeComment>();
 
     }
 }

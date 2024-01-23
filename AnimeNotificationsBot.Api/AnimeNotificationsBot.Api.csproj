@@ -24,4 +24,8 @@
     <ProjectReference Include="..\AnimeNotificationsBot.BLL\AnimeNotificationsBot.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

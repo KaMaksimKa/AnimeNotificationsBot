@@ -5,7 +5,7 @@ namespace AnimeNotificationsBot.DAL.Entities
     public class Anime: IEntity
     {
         public long Id { get; set; }
-        public required long IdFromAnimeGo { get; set; }
+        public required long AnimeIdFromAnimeGo { get; set; }
         public string? TitleEn { get; set; }
         public string? TitleRu { get; set; }
         public int? Year { get; set; }
@@ -25,22 +25,22 @@ namespace AnimeNotificationsBot.DAL.Entities
         public long? IdForComments { get; set; }
 
         public long? StatusId { get; set; }
-        public AnimeStatus? Status { get; set; }
+        public virtual AnimeStatus? Status { get; set; }
 
         public long? MpaaRateId { get; set; }
-        public MpaaRate? MpaaRate { get; set; }
+        public virtual MpaaRate? MpaaRate { get; set; }
 
         public long? TypeId { get; set; }
-        public AnimeType? Type { get; set; }
+        public virtual AnimeType? Type { get; set; }
 
         public virtual List<Studio> Studios { get; set; } = new List<Studio>();
         public virtual List<Genre> Genres { get; set; } = new List<Genre>();
         public virtual List<Dubbing> Dubbing { get; set; } = new List<Dubbing>();
-        public virtual List<Dubbing> DubbingFromFirstEpisode { get; set; } = new List<Dubbing>();
         public virtual List<AnimeComment> Comments { get; set; } = new List<AnimeComment>();
         public virtual List<AnimeSubscription> AnimeSubscriptions { get; set; } = new List<AnimeSubscription>();
-        public virtual List<Image> Images { get; set; } = new List<Image>();
         public virtual List<AnimeNotification> AnimeNotifications { get; set; } = new List<AnimeNotification>();
+        public virtual List<Episode> Episodes { get; set; } = new List<Episode>();
+        
 
     }
 }

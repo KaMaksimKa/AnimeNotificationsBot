@@ -2,12 +2,13 @@
 
 namespace AnimeNotificationsBot.DAL.Entities
 {
-    public class Studio: IEntity, ITitleEntity
+    public class Studio: IEntity, IHasUniqueProperty
     {
         public long Id { get; set; }
         public required string Title { get; set; }
 
         public virtual List<Anime> Animes { get; set; } = new List<Anime>();
-  
+        public object UniqueProperty => Title;
+
     }
 }

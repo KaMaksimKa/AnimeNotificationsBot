@@ -22,7 +22,7 @@ namespace AnimeNotificationsBot.BLL.Services
 
         public async Task<AnimeModel> GetAnimeWithImageAsync(long id)
         {
-            var anime = await _context.Animes.Include(x => x.Images).FirstOrDefaultAsync(x => x.Id == id);
+            var anime = await _context.Animes.FirstOrDefaultAsync(x => x.Id == id);
 
             if (anime == null)
             {
@@ -44,7 +44,6 @@ namespace AnimeNotificationsBot.BLL.Services
             };
 
             var query = _context.Animes
-                .Include(x => x.Images)
                 .Where(x => x.TitleRu != null);
 
             if (!string.IsNullOrEmpty(args.SearchQuery))

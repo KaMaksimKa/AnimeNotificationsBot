@@ -22,5 +22,7 @@ namespace AnimeNotificationsBot.Api.Services.Interfaces
         public Task DeleteReplyMarkup(long chatId, int messageId, CancellationToken cancellationToken = default);
 
         public Task DeleteMessageAsync(long chatId, int messageId, CancellationToken cancellationToken = default);
+
+        //public Task SendVideoMessage(long chatId, CancellationToken cancellationToken = default);
     }
 }

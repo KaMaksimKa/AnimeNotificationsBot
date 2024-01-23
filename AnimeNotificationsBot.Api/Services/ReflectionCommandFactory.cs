@@ -1,35 +1,17 @@
 ﻿using AnimeNotificationsBot.Api.Commands;
 using AnimeNotificationsBot.Api.Commands.Base;
 using AnimeNotificationsBot.Api.Commands.Base.Args;
-using AnimeNotificationsBot.Api.Commands.TelegramCommands;
-using AnimeNotificationsBot.Api.Commands.TelegramCommands.Animes;
-using AnimeNotificationsBot.Api.Commands.TelegramCommands.Feedbacks;
-using AnimeNotificationsBot.Api.Commands.TelegramCommands.Subscriptions;
 using AnimeNotificationsBot.Api.Services.Interfaces;
-using AnimeNotificationsBot.BLL.Interfaces;
-using System.Reflection.Metadata;
-using System.Reflection;
-using System.Security.AccessControl;
 
 namespace AnimeNotificationsBot.Api.Services
 {
     public class ReflectionCommandFactory : ICommandFactory
     {
-        private readonly Dictionary<string, object> _services;
+        private readonly IServiceProvider _serviceProvider;
 
-        public ReflectionCommandFactory(IUserService userService, IBotSender botSender, IAnimeService animeService,
-            ICallbackQueryDataService callbackQueryDataService, IAnimeSubscriptionService subscriptionService,
-            IFeedbackService feedbackService)
+        public ReflectionCommandFactory(IServiceProvider serviceProvider)
         {
-            _services = new Dictionary<string, object>()
-            {
-                [nameof(IUserService)] = userService,
-                [nameof(IBotSender)] = botSender,
-                [nameof(IAnimeService)] = animeService,
-                [nameof(ICallbackQueryDataService)] = callbackQueryDataService,
-                [nameof(IAnimeSubscriptionService)] = subscriptionService,
-                [nameof(IFeedbackService)] = feedbackService,
-            };
+            _serviceProvider = serviceProvider;
         }
 
         public ICommand CreateCallbackCommand(CallbackCommandArgs commandArgs)
@@ -55,9 +37,10 @@ namespace AnimeNotificationsBot.Api.Services
 
                 object[] paramObjects = parameters.Select(y =>
                 {
-                    if (_services.ContainsKey(y.ParameterType.Name))
+                    
+                    if (_serviceProvider.GetService(y.ParameterType) is { } service)
                     {
-                        return _services[y.ParameterType.Name];
+                        return service;
                     }
                     else if (y.ParameterType.Name == commandArgs.GetType().Name)
                     {

@@ -8,6 +8,6 @@ namespace AnimeNotificationsBot.DAL.Entities
         public string Message { get; set; } = null!;
 
         public long UserId { get; set; }
-        public User User { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
     }
 }

@@ -1,19 +1,26 @@
-﻿using AnimeNotificationsBot.Api.Commands.Base;
-using System.Reflection;
+﻿
 
-var assembly = typeof(TelegramCommand).Assembly;
-
-Type baseType = typeof(CallbackCommand);
-
-var derivedTypes = assembly.GetTypes().Where(t => baseType.IsAssignableFrom(t) && t != baseType && !t.IsAbstract);
-
-Console.WriteLine($"Классы, наследующиеся от {baseType.Name} в сборке {assembly.FullName}:");
-foreach (Type type in derivedTypes)
+static string Config(string what)
 {
-    Console.WriteLine(type.FullName);
-    foreach (ParameterInfo parameter in type.GetConstructors().First().GetParameters())
+    switch (what)
     {
-        Console.WriteLine($"{parameter.ParameterType} {parameter.Name}");
+        case "api_id": return "24815852";
+        case "api_hash": return "3dfb9fd36f1455173a83b533d01f5210";
+        case "phone_number": return "+212689079781";
+        case "verification_code": Console.Write("Code: "); return Console.ReadLine();
+        case "first_name": return null;      // if sign-up is required
+        case "last_name": return null;        // if sign-up is required
+        case "password": return "ylikeMNjq7S8+";     // if user has enabled 2FA
+        default: return null;                  // let WTelegramClient decide the default config
     }
-    Console.WriteLine();
 }
+
+using var client = new WTelegram.Client(Config);
+var myself = await client.LoginUserIfNeeded();
+Console.WriteLine($"We are logged-in as {myself} (id {myself.id})");
+var chats = await client.Messages_GetAllChats();
+
+var inputFile = await client.UploadFileAsync("video.mp4");
+
+await client.SendMediaAsync(chats.chats[2089161809], "Here is the video", inputFile);
+

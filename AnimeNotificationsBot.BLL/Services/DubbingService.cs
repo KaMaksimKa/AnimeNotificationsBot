@@ -21,7 +21,6 @@ namespace AnimeNotificationsBot.BLL.Services
         public async Task<List<DubbingModel>> GetDubbingByAnimeIdAsync(long animeId)
         {
             var anime = await _context.Animes
-                .Include(x => x.DubbingFromFirstEpisode)
                 .FirstOrDefaultAsync(x => x.Id == animeId);
 
             if (anime == null)
@@ -34,7 +33,7 @@ namespace AnimeNotificationsBot.BLL.Services
                 };
             }
 
-            return anime.DubbingFromFirstEpisode
+            return anime.Dubbing
                 .Select(x => _mapper.Map<DubbingModel>(x)).ToList();
         }
     }

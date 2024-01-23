@@ -167,6 +167,5 @@ namespace AnimeNotificationsBot.Api.Services
 
             return (await _botClient.SendMediaGroupAsync(chatId, media, cancellationToken: cancellationToken)).ToList();
         }
-
     }
 }
