@@ -8,6 +8,7 @@ using ParserAnimeGO;
 using ParserAnimeGO.Interface;
 using ParserAnimeGO.Models;
 using ParserAnimeGO.Models.ParserModels;
+using System.Linq;
 using System.Transactions;
 using System.Xml.Linq;
 
@@ -351,33 +352,90 @@ namespace AnimeNotificationsBot.Quartz.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task UpdateVideoInfos(List<long>? episodeIdsFromAnimego = null, List<long>? animeIdsFromAnimego = null)
+        private async Task UpdateVideoInfosFromEpisode(List<long> episodeIdsFromAnimego)
         {
             var dubbing = await _context.Dubbing.ToListAsync();
             var providers = await _context.VideoProviders.ToListAsync();
+            var episodes = await _context.Episodes
+                .Include(x => x.VideoInfos)
+                    .ThenInclude(x => x.Dubbing)
+                .Include(x => x.VideoInfos)
+                    .ThenInclude(x => x.VideoProvider)
+                .Where(x => x.EpisodeIdFromAnimeGo.HasValue && episodeIdsFromAnimego.Contains(x.EpisodeIdFromAnimeGo.Value))
+                .ToListAsync();
 
-            if (episodeIdsFromAnimego != null)
+            foreach (var episodeIdFromAnimego in episodeIdsFromAnimego)
             {
-                foreach (var episodeIdFromAnimego in episodeIdsFromAnimego)
+                var videoDatasFromEpisode = await _parser.GetVideoDatasFromEpisodeAsync(episodeIdFromAnimego);
+                var videoInfosMapped = videoDatasFromEpisode.Select(x => _mapper.Map<VideoInfo>(x)).ToList();
+
+                foreach (var videoInfoMapped in videoInfosMapped)
                 {
-                    var videoDatasFromEpisode = await _parser.GetVideoDatasFromEpisodeAsync(episodeIdFromAnimego);
-                    var videoInfoMapped = videoDatasFromEpisode.Select(x => _mapper.Map<VideoInfo>(x)).ToList();
+                    videoInfoMapped.Dubbing = videoInfoMapped.Dubbing != null ? await PrepareForAddToContext(videoInfoMapped.Dubbing, dubbing) : null;
+                    videoInfoMapped.VideoProvider = videoInfoMapped.VideoProvider != null ? await PrepareForAddToContext(videoInfoMapped.VideoProvider, providers) : null;
 
-                    foreach (var videoInfo in videoInfoMapped)
+                    var episode = episodes
+                        .FirstOrDefault(x => x.EpisodeIdFromAnimeGo == episodeIdFromAnimego);
+
+                    if (episode != null)
                     {
-                        videoInfo.Dubbing = videoInfo.Dubbing != null ? await PrepareForAddToContext(videoInfo.Dubbing, dubbing) : null;
-                        videoInfo.VideoProvider = videoInfo.VideoProvider != null ? await PrepareForAddToContext(videoInfo.VideoProvider, providers) : null;
+                        var videoInfoFromDb = episode.VideoInfos
+                            .FirstOrDefault(x =>
+                                x.Dubbing?.Title == videoInfoMapped.Dubbing?.Title &&
+                                x.VideoProvider?.Name == videoInfoMapped.VideoProvider?.Name);
 
-                        if (_animes.FirstOrDefault(x => anime.AnimeIdFromAnimeGo == x.AnimeIdFromAnimeGo) is
-                            { } animeFromDb)
-                        {
-                            _mapper.Map(anime, animeFromDb);
-                        }
+                        if (videoInfoFromDb != null)
+                            _mapper.Map(videoInfoMapped, videoInfoFromDb);
                         else
-                            await _context.Animes.AddAsync(anime);
+                            episode.VideoInfos.Add(videoInfoMapped);
                     }
                 }
             }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task UpdateVideoInfosFromFilm(List<long> animeIdsFromAnimego)
+        {
+            var dubbing = await _context.Dubbing.ToListAsync();
+            var providers = await _context.VideoProviders.ToListAsync();
+            var episodes = await _context.Episodes
+                .Include(x => x.Anime)
+                .Include(x => x.VideoInfos)
+                    .ThenInclude(x => x.Dubbing)
+                .Include(x => x.VideoInfos)
+                    .ThenInclude(x => x.VideoProvider)
+                .Where(x => x.EpisodeIdFromAnimeGo == null && animeIdsFromAnimego.Contains(x.Anime.AnimeIdFromAnimeGo))
+                .ToListAsync();
+
+            foreach (var animeIdFromAnimego in animeIdsFromAnimego)
+            {
+                var videoDatasFromEpisode = await _parser.GetVideoDatasFromFilmAsync(animeIdFromAnimego);
+                var videoInfosMapped = videoDatasFromEpisode.Select(x => _mapper.Map<VideoInfo>(x)).ToList();
+
+                foreach (var videoInfoMapped in videoInfosMapped)
+                {
+                    videoInfoMapped.Dubbing = videoInfoMapped.Dubbing != null ? await PrepareForAddToContext(videoInfoMapped.Dubbing, dubbing) : null;
+                    videoInfoMapped.VideoProvider = videoInfoMapped.VideoProvider != null ? await PrepareForAddToContext(videoInfoMapped.VideoProvider, providers) : null;
+                    var episode = episodes
+                        .FirstOrDefault(x => x.Anime.AnimeIdFromAnimeGo == animeIdFromAnimego);
+
+                    if (episode != null)
+                    {
+                        var videoInfoFromDb = episode.VideoInfos
+                            .FirstOrDefault(x =>
+                                x.Dubbing?.Title == videoInfoMapped.Dubbing?.Title &&
+                                x.VideoProvider?.Name == videoInfoMapped.VideoProvider?.Name);
+
+                        if (videoInfoFromDb != null)
+                            _mapper.Map(videoInfoMapped, videoInfoFromDb);
+                        else
+                            episode.VideoInfos.Add(videoInfoMapped);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

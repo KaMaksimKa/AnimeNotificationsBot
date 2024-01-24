@@ -2,10 +2,10 @@
 
 namespace AnimeNotificationsBot.DAL.Entities
 {
-    public class Episode:IEntity,IHasUniqueProperty
+    public class Episode:IEntity
     {
         public long Id { get; set; }
-        public long EpisodeIdFromAnimeGo { get; set; }
+        public long? EpisodeIdFromAnimeGo { get; set; }
         public int? Number { get; set; }
         public string? Title { get; set; }
         public DateTimeOffset? Released { get; set; }
@@ -17,7 +17,5 @@ namespace AnimeNotificationsBot.DAL.Entities
 
         public virtual List<VideoInfo> VideoInfos { get; set; } = new List<VideoInfo>();
         public virtual List<AnimeNotification> AnimeNotifications { get; set; } = new List<AnimeNotification> ();
-
-        public object UniqueProperty => EpisodeIdFromAnimeGo;
     }
 }
