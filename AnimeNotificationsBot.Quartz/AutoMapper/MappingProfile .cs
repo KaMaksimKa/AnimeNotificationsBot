@@ -16,6 +16,7 @@ namespace AnimeNotificationsBot.Quartz.AutoMapper
                 
 
             CreateMap<AnimeFullModel, Anime>()
+                .ForMember(d => d.AnimeIdFromAnimeGo, m => m.MapFrom(d => d.AnimeId))
                 .ForMember(d => d.Type, m => m.MapFrom(s => s.Type == null ? null : new AnimeType() { Title = s.Type }))
                 .ForMember(d => d.Status, m => m.MapFrom(s => s.Status == null ? null : new AnimeStatus() { Title = s.Status }))
                 .ForMember(d => d.MpaaRate, m => m.MapFrom(s => s.MpaaRate == null ? null : new MpaaRate() { Title = s.MpaaRate }))
@@ -31,7 +32,7 @@ namespace AnimeNotificationsBot.Quartz.AutoMapper
                         (DateTimeOffset?)(s.CreatedDate.HasValue ? s.CreatedDate.Value.ToUniversalTime() : null)));
 
             CreateMap<EpisodeData, Episode>()
-                .ForMember(d => d.Released, m => m.MapFrom(s => s.EpisodeReleased ))
+                .ForMember(d => d.Released, m => m.MapFrom(s => (DateTimeOffset?)(s.EpisodeReleased.HasValue ? s.EpisodeReleased.Value.ToUniversalTime(): null) ))
                 .ForMember(d => d.AnimeId, m => m.Ignore())
                 .ForMember(d => d.Number, m => m.MapFrom(s => s.EpisodeNumber))
                 .ForMember(d => d.Description, m => m.MapFrom(s => s.EpisodeDescription))

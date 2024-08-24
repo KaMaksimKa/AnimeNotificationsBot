@@ -1,26 +1,47 @@
-﻿
+﻿using AnimeNotificationsBot.DAL;
+using AnimeNotificationsBot.DAL.Entities;
+using AnimeNotificationsBot.Quartz.AutoMapper;
+using AnimeNotificationsBot.Quartz.Services;
+using AutoMapper;
+using KodikDownloader;
+using Microsoft.EntityFrameworkCore;
+using ParserAnimeGO;
+using ParserAnimeGO.Models;
+using System.Configuration;
 
-static string Config(string what)
+var requestParseraHandler = new RequestParserHandler();
+var requestParserFactory = new RequestParserFactory();
+var parserFromIDocument = new ParserFromIDocument();
+var uriFactory = new AnimeGoUriFactory();
+
+var parserAnime = new ParserAnimeGo(requestParseraHandler, requestParserFactory, parserFromIDocument, uriFactory);
+
+
+var dbOptionsBuilder = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>
 {
-    switch (what)
-    {
-        case "api_id": return "24815852";
-        case "api_hash": return "3dfb9fd36f1455173a83b533d01f5210";
-        case "phone_number": return "+212689079781";
-        case "verification_code": Console.Write("Code: "); return Console.ReadLine();
-        case "first_name": return null;      // if sign-up is required
-        case "last_name": return null;        // if sign-up is required
-        case "password": return "ylikeMNjq7S8+";     // if user has enabled 2FA
-        default: return null;                  // let WTelegramClient decide the default config
-    }
-}
+    
+};
 
-using var client = new WTelegram.Client(Config);
-var myself = await client.LoginUserIfNeeded();
-Console.WriteLine($"We are logged-in as {myself} (id {myself.id})");
-var chats = await client.Messages_GetAllChats();
 
-var inputFile = await client.UploadFileAsync("video.mp4");
+var connectionString = "Server=localhost;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd";
 
-await client.SendMediaAsync(chats.chats[2089161809], "Here is the video", inputFile);
+DataContext.Configure(dbOptionsBuilder, connectionString);
 
+
+var context = new DataContext(dbOptionsBuilder.Options);
+await context.Database.MigrateAsync();
+
+
+var configuration = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile<MappingProfile>(); 
+});
+
+
+var mapper = configuration.CreateMapper();
+
+var kodikClient = new KodikClient();
+
+var animeService = new AnimeService(parserAnime, context, mapper, uriFactory, kodikClient);
+
+await animeService.UpdateNotificationsAsync();

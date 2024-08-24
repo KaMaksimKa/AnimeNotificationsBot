@@ -17,7 +17,7 @@ namespace AnimeNotificationsBot.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -104,6 +104,10 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.Property<string>("ImgHref")
                         .HasColumnType("text")
                         .HasColumnName("img_href");
+
+                    b.Property<string>("ImgIdFromAnimeGo")
+                        .HasColumnType("text")
+                        .HasColumnName("img_id_from_anime_go");
 
                     b.Property<long?>("MpaaRateId")
                         .HasColumnType("bigint")
@@ -231,13 +235,13 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("dubbing_id");
 
+                    b.Property<long>("EpisodeId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("episode_id");
+
                     b.Property<bool>("IsNotified")
                         .HasColumnType("boolean")
                         .HasColumnName("is_notified");
-
-                    b.Property<int?>("SerialNumber")
-                        .HasColumnType("integer")
-                        .HasColumnName("serial_number");
 
                     b.HasKey("Id")
                         .HasName("pk_anime_notifications");
@@ -245,9 +249,12 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.HasIndex("DubbingId")
                         .HasDatabaseName("ix_anime_notifications_dubbing_id");
 
-                    b.HasIndex("AnimeId", "DubbingId", "SerialNumber")
+                    b.HasIndex("EpisodeId")
+                        .HasDatabaseName("ix_anime_notifications_episode_id");
+
+                    b.HasIndex("AnimeId", "DubbingId", "EpisodeId")
                         .IsUnique()
-                        .HasDatabaseName("ix_anime_notifications_anime_id_dubbing_id_serial_number");
+                        .HasDatabaseName("ix_anime_notifications_anime_id_dubbing_id_episode_id");
 
                     b.ToTable("anime_notifications", (string)null);
                 });
@@ -483,6 +490,10 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.HasIndex("AnimeId")
                         .HasDatabaseName("ix_episodes_anime_id");
 
+                    b.HasIndex("EpisodeIdFromAnimeGo")
+                        .IsUnique()
+                        .HasDatabaseName("ix_episodes_episode_id_from_anime_go");
+
                     b.ToTable("episodes", (string)null);
                 });
 
@@ -637,6 +648,42 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Video", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ManifestLink")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("manifest_link");
+
+                    b.Property<long?>("MediaDocumentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("media_document_id");
+
+                    b.Property<string>("Quality")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("quality");
+
+                    b.Property<long>("VideoInfoId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("video_info_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_videos");
+
+                    b.HasIndex("VideoInfoId")
+                        .HasDatabaseName("ix_videos_video_info_id");
+
+                    b.ToTable("videos", (string)null);
+                });
+
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.VideoInfo", b =>
                 {
                     b.Property<long>("Id")
@@ -655,6 +702,7 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnName("episode_id");
 
                     b.Property<string>("VideoPlayerLink")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("video_player_link");
 
@@ -663,18 +711,18 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .HasColumnName("video_provider_id");
 
                     b.HasKey("Id")
-                        .HasName("pk_video_info");
+                        .HasName("pk_video_infos");
 
                     b.HasIndex("DubbingId")
-                        .HasDatabaseName("ix_video_info_dubbing_id");
+                        .HasDatabaseName("ix_video_infos_dubbing_id");
 
                     b.HasIndex("EpisodeId")
-                        .HasDatabaseName("ix_video_info_episode_id");
+                        .HasDatabaseName("ix_video_infos_episode_id");
 
                     b.HasIndex("VideoProviderId")
-                        .HasDatabaseName("ix_video_info_video_provider_id");
+                        .HasDatabaseName("ix_video_infos_video_provider_id");
 
-                    b.ToTable("video_info", (string)null);
+                    b.ToTable("video_infos", (string)null);
                 });
 
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.VideoProvider", b =>
@@ -813,9 +861,18 @@ namespace AnimeNotificationsBot.DAL.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_anime_notifications_dubbing_dubbing_id");
 
+                    b.HasOne("AnimeNotificationsBot.DAL.Entities.Episode", "Episode")
+                        .WithMany("AnimeNotifications")
+                        .HasForeignKey("EpisodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_anime_notifications_episodes_episode_id");
+
                     b.Navigation("Anime");
 
                     b.Navigation("Dubbing");
+
+                    b.Navigation("Episode");
                 });
 
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.AnimeSubscription", b =>
@@ -896,22 +953,34 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Video", b =>
+                {
+                    b.HasOne("AnimeNotificationsBot.DAL.Entities.VideoInfo", "VideoInfo")
+                        .WithMany("Videos")
+                        .HasForeignKey("VideoInfoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_videos_video_infos_video_info_id");
+
+                    b.Navigation("VideoInfo");
+                });
+
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.VideoInfo", b =>
                 {
                     b.HasOne("AnimeNotificationsBot.DAL.Entities.Dubbing", "Dubbing")
                         .WithMany("VideoInfos")
                         .HasForeignKey("DubbingId")
-                        .HasConstraintName("fk_video_info_dubbing_dubbing_id");
+                        .HasConstraintName("fk_video_infos_dubbing_dubbing_id");
 
                     b.HasOne("AnimeNotificationsBot.DAL.Entities.Episode", "Episode")
                         .WithMany("VideoInfos")
                         .HasForeignKey("EpisodeId")
-                        .HasConstraintName("fk_video_info_episodes_episode_id");
+                        .HasConstraintName("fk_video_infos_episodes_episode_id");
 
                     b.HasOne("AnimeNotificationsBot.DAL.Entities.VideoProvider", "VideoProvider")
                         .WithMany("VideoInfos")
                         .HasForeignKey("VideoProviderId")
-                        .HasConstraintName("fk_video_info_video_providers_video_provider_id");
+                        .HasConstraintName("fk_video_infos_video_providers_video_provider_id");
 
                     b.Navigation("Dubbing");
 
@@ -979,6 +1048,8 @@ namespace AnimeNotificationsBot.DAL.Migrations
 
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.Episode", b =>
                 {
+                    b.Navigation("AnimeNotifications");
+
                     b.Navigation("VideoInfos");
                 });
 
@@ -994,6 +1065,11 @@ namespace AnimeNotificationsBot.DAL.Migrations
                     b.Navigation("BotMessageGroups");
 
                     b.Navigation("Feedbacks");
+                });
+
+            modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.VideoInfo", b =>
+                {
+                    b.Navigation("Videos");
                 });
 
             modelBuilder.Entity("AnimeNotificationsBot.DAL.Entities.VideoProvider", b =>

@@ -2,7 +2,11 @@
 using AnimeNotificationsBot.Common.Interfaces;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.DAL.Entities;
+using AnimeNotificationsBot.DAL.Migrations;
+using AnimeNotificationsBot.Quartz.Models;
 using AutoMapper;
+using KodikDownloader;
+using KodikDownloader.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using ParserAnimeGO;
 using ParserAnimeGO.Interface;
@@ -19,132 +23,152 @@ namespace AnimeNotificationsBot.Quartz.Services
         private readonly ParserAnimeGo _parser;
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        private readonly IImageService _imageService;
         private readonly IAnimeGoUriFactory _animeGoUriFactory;
+        private readonly KodikClient _kodikClient;
 
-
-        public AnimeService(ParserAnimeGo parser, DataContext context, IMapper mapper, IImageService imageService,
-            IAnimeGoUriFactory animeGoUriFactory)
+        public AnimeService(ParserAnimeGo parser, DataContext context, IMapper mapper,
+            IAnimeGoUriFactory animeGoUriFactory, KodikClient kodikClient)
         {
             _parser = parser;
             _context = context;
             _mapper = mapper;
-            _imageService = imageService;
             _animeGoUriFactory = animeGoUriFactory;
+            _kodikClient = kodikClient;
         }
 
         public async Task UpdateNotificationsAsync()
         {
-            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+
+
+            var notificationsFromParser = (await _parser.GetAnimeNotificationsAsync())
+                .Where(x => x.AnimeId.HasValue && !string.IsNullOrEmpty(x.Dubbing))
+                .ToList();
+
+            #region Добавление новых аниме в базу
+
+            var animes = await _context.Animes
+                .Include(x => x.Episodes)
+                .Where(x => notificationsFromParser
+                    .Select(y => y.AnimeId)
+                    .Contains(x.AnimeIdFromAnimeGo))
+                .ToListAsync();
+
+            var newAnimesIdsFromAnimeGo = notificationsFromParser
+                .Where(x => x.AnimeId.HasValue && animes.All(y => y.AnimeIdFromAnimeGo != x.AnimeId))
+                .Select(x => x.AnimeId!.Value)
+                .ToList()
+                .Distinct()
+                .ToList();
+
+            if (newAnimesIdsFromAnimeGo.Any())
             {
+                var newAnimesFromParser = await _parser.GetFullAnimesRangeAsync(newAnimesIdsFromAnimeGo);
 
-                var notificationsFromParser = (await _parser.GetAnimeNotificationsAsync())
-                    .Where(x => x.AnimeId.HasValue && !string.IsNullOrEmpty(x.Dubbing))
-                    .ToList();
+                var newAnimes = await SaveAnimeInContext(newAnimesFromParser);
 
-                #region Добавление новых аниме в базу
+                animes.AddRange(newAnimes);
+            }
 
-                var animes = await _context.Animes
-                    .Include(x => x.Episodes)
-                    .Where(x => notificationsFromParser
-                        .Select(y => y.AnimeId)
-                        .Contains(x.AnimeIdFromAnimeGo))
-                    .ToListAsync();
+            #endregion
 
-                var newAnimesIdsFromAnimeGo = notificationsFromParser
-                    .Where(x => x.AnimeId.HasValue && animes.All(y => y.AnimeIdFromAnimeGo != x.AnimeId))
-                    .Select(x => x.AnimeId!.Value)
-                    .ToList();
+            #region Добавление новой озвучки в базу
 
-                if (newAnimesIdsFromAnimeGo.Any())
+            var dubbing = await _context.Dubbing
+                .Where(x => notificationsFromParser
+                    .Select(y => y.Dubbing)
+                    .Contains(x.Title))
+                .ToListAsync();
+
+            var newDubbingTitles = notificationsFromParser
+                .Where(x => x.Dubbing != null && dubbing.All(y => y.Title != x.Dubbing))
+                .Select(x => x.Dubbing!)
+                .Distinct()
+                .ToList();
+
+            if (newDubbingTitles.Any())
+            {
+                var newDubbing = newDubbingTitles.Select(x => new Dubbing()
                 {
-                    var newAnimesFromParser = await _parser.GetFullAnimesRangeAsync(newAnimesIdsFromAnimeGo);
-                    var newAnimes = await SaveAnimeInContext(newAnimesFromParser);
+                    Title = x
+                }).ToList();
 
-                    animes.AddRange(newAnimes);
-                }
-
-                #endregion
-
-                #region Добавление новой озвучки в базу
-
-                var dubbing = await _context.Dubbing
-                    .Where(x => notificationsFromParser
-                        .Select(y => y.Dubbing)
-                        .Contains(x.Title))
-                    .ToListAsync();
-
-                var newDubbingTitles = notificationsFromParser
-                    .Where(x => x.Dubbing != null && dubbing.All(y => y.Title != x.Dubbing))
-                    .Select(x => x.Dubbing!)
-                    .ToList();
-
-                if (newDubbingTitles.Any())
-                {
-                    var newDubbing = newDubbingTitles.Select(x => new Dubbing()
-                    {
-                        Title = x
-                    }).ToList();
-
-                    await _context.Dubbing.AddRangeAsync(newDubbing);
-
-                    await _context.SaveChangesAsync();
-
-                    dubbing.AddRange(newDubbing);
-                }
-
-                #endregion
-
-                #region Обновление информации об эпизодах в базу
-
-                await UpdateEpisodeByAnime(notificationsFromParser.Where(x => x.AnimeId.HasValue).Select(x => x.AnimeId!.Value).ToList());
-
-                #endregion
-
-                #region Добавление уведомлений об аниме в базу
-
-                var episodes = await _context.Episodes
-                    .Include(x => x.Anime)
-                    .Where(x => notificationsFromParser
-                        .Select(y => new { AnimeIdFromAnimeGo = y.AnimeId!.Value, EpisodeNumber = y.EpisodeNumber })
-                        .ToList()
-                        .Contains(new { AnimeIdFromAnimeGo = x.Anime.AnimeIdFromAnimeGo, EpisodeNumber = x.Number }))
-                    .ToListAsync();
-
-                foreach (var notificationFromParser in notificationsFromParser)
-                {
-                    var anime = animes.FirstOrDefault(x => x.AnimeIdFromAnimeGo == notificationFromParser.AnimeId);
-                    var dub = dubbing.FirstOrDefault(x => x.Title == notificationFromParser.Dubbing);
-                    var episode = episodes.FirstOrDefault(x => x.Anime.AnimeIdFromAnimeGo == notificationFromParser.AnimeId
-                        && x.Number == notificationFromParser.EpisodeNumber);
-
-                    var notification = await _context.AnimeNotifications
-                            .Where(x => x.Anime.AnimeIdFromAnimeGo == notificationFromParser.AnimeId
-                                        && x.Dubbing.Title == notificationFromParser.Dubbing
-                                        && (x.Episode.Number == notificationFromParser.EpisodeNumber))
-                            .FirstOrDefaultAsync();
-
-                    if (anime != null && dub != null && episode != null && notification == null)
-                    {
-
-
-                        await _context.AnimeNotifications.AddAsync(new AnimeNotification()
-                        {
-                            Episode = episode,
-                            Dubbing = dub,
-                            Anime = anime,
-                            CreatedDate = DateTimeOffset.Now.ToUniversalTime(),
-                            IsNotified = false
-                        });
-                    }
-                }
+                await _context.Dubbing.AddRangeAsync(newDubbing);
 
                 await _context.SaveChangesAsync();
-                #endregion
 
-
-                scope.Complete();
+                dubbing.AddRange(newDubbing);
             }
+
+            #endregion
+
+            #region Обновление информации об эпизодах в базу
+
+            await UpdateEpisodeByAnime(notificationsFromParser.Where(x => x.AnimeId.HasValue).Select(x => x.AnimeId!.Value).ToList());
+
+            #endregion
+
+            #region Добавление уведомлений об аниме в базу
+            var epidsodesSelectorRow = notificationsFromParser
+                .Select(x => x.AnimeId + " " + x.EpisodeNumber)
+                .ToList();
+
+            var episodes = await _context.Episodes
+               .Include(x => x.Anime)
+               .Where(x => epidsodesSelectorRow.Contains(x.Anime.AnimeIdFromAnimeGo.ToString() + " " + x.Number.ToString()))
+               .ToListAsync();
+
+            foreach (var notificationFromParser in notificationsFromParser)
+            {
+                var anime = animes.FirstOrDefault(x => x.AnimeIdFromAnimeGo == notificationFromParser.AnimeId);
+                var dub = dubbing.FirstOrDefault(x => x.Title == notificationFromParser.Dubbing);
+                var episode = episodes.FirstOrDefault(x => x.Anime.AnimeIdFromAnimeGo == notificationFromParser.AnimeId
+                    && x.Number == notificationFromParser.EpisodeNumber);
+
+                var notification = await _context.AnimeNotifications
+                        .Where(x => x.Anime.AnimeIdFromAnimeGo == notificationFromParser.AnimeId
+                                    && x.Dubbing.Title == notificationFromParser.Dubbing
+                                    && (x.Episode.Number == notificationFromParser.EpisodeNumber))
+                        .FirstOrDefaultAsync();
+
+                if (anime != null && dub != null && episode != null && notification == null)
+                {
+
+
+                    await _context.AnimeNotifications.AddAsync(new AnimeNotification()
+                    {
+                        Episode = episode,
+                        Dubbing = dub,
+                        Anime = anime,
+                        CreatedDate = DateTimeOffset.Now.ToUniversalTime(),
+                        IsNotified = false
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            #endregion
+
+            #region Добавление информации о видео в базу
+
+            var episodeIds = episodes.Select(x => x.Id).ToList();
+            var updateVideoInfosModels = await _context.Episodes
+                .Where(x => episodeIds.Contains(x.Id))
+                .Select(x => new UpdateVideoInfoModel
+                {
+                    AnimeIdFromAnimego = x.Anime.AnimeIdFromAnimeGo,
+                    EpisodeIdFromAnimego = x.EpisodeIdFromAnimeGo
+
+                }).ToListAsync();
+
+            var videoInfos = await UpdateVideoInfos(updateVideoInfosModels);
+
+            #endregion
+
+            #region Добавление видео в базу
+
+            await UpdateVideosFromKodik(videoInfos.Select(x => x.VideoPlayerLink).ToList());
+
+            #endregion
 
         }
 
@@ -211,6 +235,11 @@ namespace AnimeNotificationsBot.Quartz.Services
             } while (animesFromParser.Any());
 
 
+        }
+
+        public async Task<string?> GetKodikManifestLinkAsync()
+        {
+            return (await _context.Videos.FirstOrDefaultAsync(x => x.MediaDocumentId == null))?.ManifestLink;
         }
 
         private async Task<List<Anime>> SaveAnimeInContext(List<AnimeFullModel> animesFromParser)
@@ -308,8 +337,10 @@ namespace AnimeNotificationsBot.Quartz.Services
             }
         }
 
-        private async Task UpdateEpisodeByAnime(List<long> animeIdsFromAnimego)
+        private async Task<List<Episode>> UpdateEpisodeByAnime(List<long> animeIdsFromAnimego)
         {
+            var episodes = new List<Episode>();
+
             var animes = await _context.Animes
                 .Include(x => x.Episodes)
                 .Where(x => animeIdsFromAnimego.Contains(x.AnimeIdFromAnimeGo))
@@ -335,7 +366,12 @@ namespace AnimeNotificationsBot.Quartz.Services
                         });
                     }
                 }
-                var episodesMapped = episodesFromParser.Select(x => _mapper.Map<Episode>(x));
+                var episodesMapped = episodesFromParser.Select(x =>
+                {
+                    var m = _mapper.Map<Episode>(x);
+                    m.AnimeId = anime.Id;
+                    return m;
+                });
 
                 foreach (var episodeMapped in episodesMapped)
                 {
@@ -343,82 +379,61 @@ namespace AnimeNotificationsBot.Quartz.Services
                         { } episodeFromDb)
                     {
                         _mapper.Map(episodeMapped, episodeFromDb);
+                        episodes.Add(episodeFromDb);
                     }
                     else
-                        anime.Episodes.Add(episodeMapped);
-                }
-            }
-
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task UpdateVideoInfosFromEpisode(List<long> episodeIdsFromAnimego)
-        {
-            var dubbing = await _context.Dubbing.ToListAsync();
-            var providers = await _context.VideoProviders.ToListAsync();
-            var episodes = await _context.Episodes
-                .Include(x => x.VideoInfos)
-                    .ThenInclude(x => x.Dubbing)
-                .Include(x => x.VideoInfos)
-                    .ThenInclude(x => x.VideoProvider)
-                .Where(x => x.EpisodeIdFromAnimeGo.HasValue && episodeIdsFromAnimego.Contains(x.EpisodeIdFromAnimeGo.Value))
-                .ToListAsync();
-
-            foreach (var episodeIdFromAnimego in episodeIdsFromAnimego)
-            {
-                var videoDatasFromEpisode = await _parser.GetVideoDatasFromEpisodeAsync(episodeIdFromAnimego);
-                var videoInfosMapped = videoDatasFromEpisode.Select(x => _mapper.Map<VideoInfo>(x)).ToList();
-
-                foreach (var videoInfoMapped in videoInfosMapped)
-                {
-                    videoInfoMapped.Dubbing = videoInfoMapped.Dubbing != null ? await PrepareForAddToContext(videoInfoMapped.Dubbing, dubbing) : null;
-                    videoInfoMapped.VideoProvider = videoInfoMapped.VideoProvider != null ? await PrepareForAddToContext(videoInfoMapped.VideoProvider, providers) : null;
-
-                    var episode = episodes
-                        .FirstOrDefault(x => x.EpisodeIdFromAnimeGo == episodeIdFromAnimego);
-
-                    if (episode != null)
                     {
-                        var videoInfoFromDb = episode.VideoInfos
-                            .FirstOrDefault(x =>
-                                x.Dubbing?.Title == videoInfoMapped.Dubbing?.Title &&
-                                x.VideoProvider?.Name == videoInfoMapped.VideoProvider?.Name);
-
-                        if (videoInfoFromDb != null)
-                            _mapper.Map(videoInfoMapped, videoInfoFromDb);
-                        else
-                            episode.VideoInfos.Add(videoInfoMapped);
+                        await _context.Episodes.AddAsync(episodeMapped);
+                        episodes.Add(episodeMapped);
                     }
                 }
+
+                
             }
 
             await _context.SaveChangesAsync();
+
+            return episodes;
         }
 
-        private async Task UpdateVideoInfosFromFilm(List<long> animeIdsFromAnimego)
+        private async Task<List<VideoInfo>> UpdateVideoInfos(List<UpdateVideoInfoModel> models)
         {
+            var videoInfos = new List<VideoInfo>();
+
             var dubbing = await _context.Dubbing.ToListAsync();
             var providers = await _context.VideoProviders.ToListAsync();
+
+            var episodesSelector = models.Select(x => x.EpisodeIdFromAnimego.HasValue
+                ? x.AnimeIdFromAnimego.ToString() + " " + x.EpisodeIdFromAnimego.ToString()
+                : x.AnimeIdFromAnimego.ToString());
+
             var episodes = await _context.Episodes
                 .Include(x => x.Anime)
                 .Include(x => x.VideoInfos)
                     .ThenInclude(x => x.Dubbing)
                 .Include(x => x.VideoInfos)
                     .ThenInclude(x => x.VideoProvider)
-                .Where(x => x.EpisodeIdFromAnimeGo == null && animeIdsFromAnimego.Contains(x.Anime.AnimeIdFromAnimeGo))
+                .Where(x => episodesSelector.Contains(x.EpisodeIdFromAnimeGo.HasValue
+                    ? x.Anime.AnimeIdFromAnimeGo.ToString() + " " + x.EpisodeIdFromAnimeGo.ToString()
+                    : x.Anime.AnimeIdFromAnimeGo.ToString()))
                 .ToListAsync();
 
-            foreach (var animeIdFromAnimego in animeIdsFromAnimego)
+            foreach (var model in models)
             {
-                var videoDatasFromEpisode = await _parser.GetVideoDatasFromFilmAsync(animeIdFromAnimego);
-                var videoInfosMapped = videoDatasFromEpisode.Select(x => _mapper.Map<VideoInfo>(x)).ToList();
+                List<VideoInfo> videoInfosMapped;
+
+                var videoDatasFromEpisode = (model.EpisodeIdFromAnimego.HasValue
+                    ? (await _parser.GetVideoDatasFromEpisodeAsync(model.EpisodeIdFromAnimego.Value)).Cast<VideoData>()
+                    : (await _parser.GetVideoDatasFromFilmAsync(model.AnimeIdFromAnimego)).Cast<VideoData>()).ToList();
+                videoInfosMapped = videoDatasFromEpisode.Select(x => _mapper.Map<VideoInfo>(x)).ToList();
 
                 foreach (var videoInfoMapped in videoInfosMapped)
                 {
                     videoInfoMapped.Dubbing = videoInfoMapped.Dubbing != null ? await PrepareForAddToContext(videoInfoMapped.Dubbing, dubbing) : null;
                     videoInfoMapped.VideoProvider = videoInfoMapped.VideoProvider != null ? await PrepareForAddToContext(videoInfoMapped.VideoProvider, providers) : null;
-                    var episode = episodes
-                        .FirstOrDefault(x => x.Anime.AnimeIdFromAnimeGo == animeIdFromAnimego);
+
+                    var episode = episodes.FirstOrDefault(x => x.EpisodeIdFromAnimeGo == model.EpisodeIdFromAnimego 
+                        && x.Anime.AnimeIdFromAnimeGo == model.AnimeIdFromAnimego);
 
                     if (episode != null)
                     {
@@ -428,14 +443,56 @@ namespace AnimeNotificationsBot.Quartz.Services
                                 x.VideoProvider?.Name == videoInfoMapped.VideoProvider?.Name);
 
                         if (videoInfoFromDb != null)
+                        {
                             _mapper.Map(videoInfoMapped, videoInfoFromDb);
+                            videoInfos.Add(videoInfoFromDb);
+                        }
                         else
+                        {
                             episode.VideoInfos.Add(videoInfoMapped);
+                            videoInfos.Add(videoInfoMapped);
+                        }
                     }
                 }
             }
 
             await _context.SaveChangesAsync();
+
+            return videoInfos;
+        }
+
+        private async Task<List<VideoInfo>> UpdateVideosFromKodik(List<string> shareKodikLinks)
+        {
+            var videos = new List<Video>();
+            var videosInfo = await _context.VideoInfos.Where(x => shareKodikLinks.Contains(x.VideoPlayerLink)).ToListAsync();
+
+            foreach(var shareLink in shareKodikLinks)
+            {
+                var links = await _kodikClient.GetLinksAsync(shareLink);
+                var videoInfo = videosInfo.FirstOrDefault(x => x.VideoPlayerLink == shareLink);
+
+                if (links != null && videoInfo != null)
+                {
+                    foreach (var link in links.LinksByQuality)
+                    {
+                        videos.AddRange(link.Value.Select(x => new Video
+                        {
+                            ManifestLink = x.Link,
+                            Quality = link.Key,
+                            VideoInfoId = videoInfo.Id
+                        }));
+                    }
+                }
+            }
+            await _context.Videos.AddRangeAsync(videos);
+            await _context.SaveChangesAsync();
+
+            return videosInfo;
+        }
+
+        public Task PutKodikManifestLinkAsync(Dictionary<string, int> telegramDocumentIdsByManifestLink)
+        {
+            throw new NotImplementedException();
         }
     }
 }

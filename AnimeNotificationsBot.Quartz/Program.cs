@@ -1,10 +1,11 @@
 using AnimeNotificationsBot.BLL.Configs;
 using AnimeNotificationsBot.BLL.Interfaces;
-using AnimeNotificationsBot.BLL.Services;
 using AnimeNotificationsBot.DAL;
 using AnimeNotificationsBot.Quartz.AutoMapper;
 using AnimeNotificationsBot.Quartz.Configs;
 using AnimeNotificationsBot.Quartz.JobOptions;
+using AnimeNotificationsBot.Quartz.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ParserAnimeGO;
 using ParserAnimeGO.Interface;
@@ -40,11 +41,7 @@ builder.Services.AddScoped<ParserAnimeGo>();
 var quartzSection = builder.Configuration.GetSection(QuartzConfig.Configuration);
 builder.Services.Configure<QuartzConfig>(quartzSection);
 
-var imageSection = builder.Configuration.GetSection(ImageConfig.Configuration);
-builder.Services.Configure<ImageConfig>(imageSection);
-
-builder.Services.AddScoped<IFileService, FileService>();
-builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.Configure<AnimeNotificationBotConfig>(builder.Configuration.GetSection(AnimeNotificationBotConfig.Configuration));
 
 builder.Services.AddScoped<AnimeNotificationsBot.Quartz.Services.AnimeService>();
 
@@ -68,5 +65,9 @@ using (var scope = app.Services.CreateScope())
 
 
 app.MapGet("/ping", () => Results.Ok("Ok"));
+
+app.MapGet("/kodikManifestLink", async (AnimeService animeService) => await animeService.GetKodikManifestLinkAsync());
+
+app.MapPut("/kodikManifestLink", async ([FromBody]Dictionary<string,int> telegramDocumentIdsByManifestLink,AnimeService animeService) => await animeService.PutKodikManifestLinkAsync(telegramDocumentIdsByManifestLink));
 
 app.Run();

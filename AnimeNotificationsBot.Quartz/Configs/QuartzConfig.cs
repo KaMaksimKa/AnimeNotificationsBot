@@ -2,7 +2,7 @@
 {
     public class QuartzConfig
     {
-        public static readonly string Configuration = "QuartzConfig";
+        public const string Configuration = "QuartzConfig";
 
         public string AnimeNotificationCronSchedule { get; set; } = default!;
         public string UpdateAnimesCronSchedule { get; set; } = default!;

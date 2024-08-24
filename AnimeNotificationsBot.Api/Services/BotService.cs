@@ -1,5 +1,7 @@
 ﻿using AnimeNotificationsBot.Api.Commands.Base.Args;
+using AnimeNotificationsBot.Api.Messages.Notifications;
 using AnimeNotificationsBot.Api.Services.Interfaces;
+using AnimeNotificationsBot.BLL.Interfaces;
 using Telegram.Bot.Types;
 
 namespace AnimeNotificationsBot.Api.Services
@@ -7,10 +9,14 @@ namespace AnimeNotificationsBot.Api.Services
     public class BotService:IBotService
     {
         private readonly ICommandFactory _commandFactory;
+        private readonly IAnimeNotificationService _notificationService;
+        private readonly IBotSender _botSender;
 
-        public BotService(ICommandFactory commandFactory)
+        public BotService(ICommandFactory commandFactory, IAnimeNotificationService notificationService, IBotSender botSender)
         {
             _commandFactory = commandFactory;
+            _notificationService = notificationService;
+            _botSender = botSender;
         }
 
         public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
@@ -60,5 +66,21 @@ namespace AnimeNotificationsBot.Api.Services
             return Task.CompletedTask;
         }
 
+        public async Task SendNotifications()
+        {
+            var notifications = await _notificationService.GetNewNotificationAsync();
+
+            var tasks = new List<Task>();
+
+            foreach (var notification in notifications)
+            {
+                foreach (var chatId in notification.ChatIds)
+                {
+                    tasks.Add(_botSender.SendMessageAsync(new NotifyAboutAnimeMessage(notification.AnimeNotificationModel), chatId));
+                }
+            }
+
+            await Task.WhenAll(tasks);
+        }
     }
 }

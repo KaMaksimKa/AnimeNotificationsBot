@@ -89,4 +89,10 @@ app.MapPost($"{botConfiguration.Route}/{botConfiguration.BotToken}", async (Newt
 
 app.MapGet("/ping", () => Results.Ok("Ok"));
 
+app.MapPost("/sendNotifications", async (IBotService botService) =>
+{
+    await botService.SendNotifications();
+    return Results.Ok();
+});
+
 app.Run();

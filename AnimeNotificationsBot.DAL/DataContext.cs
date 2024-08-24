@@ -21,8 +21,9 @@ namespace AnimeNotificationsBot.DAL
         public DbSet<AnimeSubscription> AnimeSubscriptions { get; set; } = null!;
         public DbSet<Feedback> Feedbacks { get; set; } = null!;
         public DbSet<Episode> Episodes { get; set; } = null!;
-        public DbSet<VideoProvider> VideoProviders { get; set; }
-        public DbSet<VideoInfo> VideoInfo { get; set; }
+        public DbSet<VideoProvider> VideoProviders { get; set; } = null!;
+        public DbSet<VideoInfo> VideoInfos { get; set; } = null!;
+        public DbSet<Video> Videos { get; set; } = null!;
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
