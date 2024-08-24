@@ -263,6 +263,7 @@ namespace AnimeNotificationsBot.Quartz.Services
 
             foreach (var anime in animes)
             {
+                //todo: вынести в парсер
                 anime.ImgHref = anime.ImgIdFromAnimeGo != null
                     ? _animeGoUriFactory.GetAnimeImage(anime.ImgIdFromAnimeGo).ToString()
                     : null;

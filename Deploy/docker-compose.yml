@@ -1,24 +1,28 @@
 version: '3.9'
 services:
-
-  anime_notification_bot_api:
-    image: kamaksimka/anime-notification-bot-api:latest
+  api:
+    build: 
+        context: ../
+        dockerfile: AnimeNotificationsBot.Api/Dockerfile
+    container_name: api
     ports:
       - "8000:80"
     depends_on:
       - db
     environment:
       ConnectionStrings__PostgreSql: "Server=db;Port=5432;Database=anime_notification_bot;User Id=sa;Password=P@ssw0rd"
-      BotConfiguration__BotToken: ""
-      BotConfiguration__HostAddress: "https://kamaksimka.ru"
+      BotConfiguration__BotToken: "6639623110:AAFRnUFQYQ5zJS7L7TvMWUqy1Jnt1p0poxo"
+      BotConfiguration__HostAddress: "https://5609-77-234-220-178.ngrok-free.app"
       QuartzConfig__NotifyAboutAnimeJobCronSchedule: "30 * * ? * * *"
     restart: always
     networks:
       - net
 
-  anime_notification_bot_quartz:
-    container_name: anime_notification_bot_quartz
-    image: kamaksimka/anime-notification-bot-quartz:latest
+  quartz:
+    container_name: quartz
+    build: 
+        context: ../
+        dockerfile: AnimeNotificationsBot.Quartz/Dockerfile 
     ports:
       - "9000:80"
     depends_on:
@@ -34,7 +38,7 @@ services:
  
   db:
     container_name: db
-    image: postgres:16
+    image: postgres:latest
     environment:
       - POSTGRES_USER=sa
       - POSTGRES_PASSWORD=P@ssw0rd
@@ -55,7 +59,7 @@ services:
       - 443:443
     restart: always
     volumes:
-      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./nginx/conf.dev/:/etc/nginx/conf.d/:ro
       - ./certbot/www:/var/www/certbot/:ro
       - ./certbot/conf/:/etc/nginx/ssl/:ro
     networks:
